@@ -1,0 +1,14 @@
+{{ if .Values.deployment.persistentVolume.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-{{ include "microservice.fullname" . }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.deployment.persistentVolume.storageSize }}
+  storageClassName: {{ .Values.deployment.persistentVolume.claimStorageClass }}
+  volumeMode: Filesystem
+{{ end -}}

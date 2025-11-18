@@ -1,0 +1,16 @@
+{{- if .Values.istio.authorization.enabled -}}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ include "microservice.fullname" . }}-authz-policy
+spec:
+  selector:
+    matchLabels:
+      {{- include "microservice.selectorLabels" . | nindent 6 }}
+  action: CUSTOM
+  provider:
+    name: "opa.local"
+  rules:
+  - {}
+{{- end }}

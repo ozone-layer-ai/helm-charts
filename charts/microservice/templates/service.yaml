@@ -1,0 +1,48 @@
+{{- $fullName := include "microservice.fullname" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$fullName}}
+  labels:
+    {{- include "microservice.labels" . | nindent 4 }}
+  annotations:
+  {{- if eq .Values.ingress.className "kong" }}
+  {{- $userAnnotations := dict -}}
+  {{- range $key, $value := .Values.service.annotations -}}
+    {{- $userAnnotations = merge $userAnnotations (dict $key $value) -}}
+  {{- end -}}
+
+  {{- $defaultAnnotations := dict "ingress.kubernetes.io/service-upstream" "true" -}}
+
+  {{- $merged := $userAnnotations -}}
+  {{- if $defaultAnnotations -}}
+    {{- range $key, $value := $defaultAnnotations -}}
+      {{- $merged = merge $merged (dict $key $value) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $output := "" -}}
+  {{- range $key, $value := $merged -}}
+    {{- $output = printf "%s%s: \"%s\"\n" $output $key $value -}}
+  {{- end -}}
+  {{- $output | nindent 4 }}
+  {{- if .Values.service.plugins -}}
+    konghq.com/plugins: {{ include "pluginNames" (dict "fullname" $fullName "plugins" .Values.service.plugins) | nindent 4 | trim }}
+  {{- end }}
+  {{- else }}
+  {{- if .Values.service.annotations }}
+  {{- toYaml .Values.service.annotations | nindent 4 }}
+  {{- end }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      {{ if .Values.service.targetPort }}
+      targetPort: {{ .Values.service.targetPort }}
+      {{else}}
+      targetPort: http
+      {{ end }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "microservice.selectorLabels" . | nindent 4 }}

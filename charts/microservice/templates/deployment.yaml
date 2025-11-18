@@ -1,0 +1,307 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "microservice.fullname" . }}
+  labels:
+    {{- include "microservice.labels" . | nindent 4 }}
+    {{- if .Values.datadogEnabled }}
+    tags.datadoghq.com/service: {{ include "microservice.fullname" . }}
+    tags.datadoghq.com/version: {{ default .Chart.AppVersion .Values.image.tag }}
+    tags.datadoghq.com/env: {{ .Values.deploymentEnvironment }}
+    {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "microservice.selectorLabels" . | nindent 6 }}
+  {{- with .Values.deploymentStrategy }}
+  strategy:
+    type: {{ .type }}
+    {{- if eq .type "RollingUpdate" }}
+    rollingUpdate:
+      maxUnavailable: {{ .rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .rollingUpdate.maxSurge }}
+    {{- end }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        secret.reloader.stakater.com/reload: {{ include "microservice.fullname" . }}
+        configmap.reloader.stakater.com/reload: {{ include "microservice.fullname" . }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "microservice.selectorLabels" . | nindent 8 }}
+        {{- if .Values.datadogEnabled }}
+        tags.datadoghq.com/service: {{ include "microservice.fullname" . }}
+        tags.datadoghq.com/version: {{ default .Chart.AppVersion .Values.image.tag }}
+        tags.datadoghq.com/env: {{ .Values.deploymentEnvironment }}
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/logs_injection: "true"
+        tags.datadoghq.com/profiling_enabled: "true"
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "microservice.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.topologySpread.enabled }}
+      topologySpreadConstraints:
+        - maxSkew: {{ .Values.topologySpread.zoneMaxSkew }}
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "microservice.selectorLabels" . | nindent 14 }}
+        - maxSkew: {{ .Values.topologySpread.hostMaxSkew }}
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "microservice.selectorLabels" . | nindent 14 }}
+      {{- end }}
+      containers:
+        - name: {{ include "microservice.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- if .Values.deployment.persistentVolume.enabled }}
+            - mountPath: {{ .Values.deployment.persistentVolume.containerMountPath }}
+              name: pd-{{ include "microservice.fullname" . }}
+          {{- end }}
+          {{ if eq (include "secrets.enabled" .) "yes" }}
+            - mountPath: {{ required "Secrets volume mount required" .Values.secrets.volume.mount }}
+              name: {{ required "Secrets volume name required" .Values.secrets.volume.name }}
+          {{- end }}
+          {{- if .Values.configVolume }}
+            - name: {{  required "configVolume.name is a required value" .Values.configVolume.name }}
+              mountPath: {{ required "configVolume.mount is a required value" .Values.configVolume.mount }}
+          {{- end }}
+          {{- with .Values.volumeMounts -}}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            # http port. kept for backward compatibility
+            - name: http
+              containerPort: {{ .Values.deployment.containerHttpPort }}
+              protocol: TCP
+            # Get all the ports defined for the deployment
+          {{- range $key, $value := .Values.deployment.ports}}
+            - name: {{ $key }}
+              containerPort: {{ $value }}
+              protocol: TCP
+          {{- end }}
+          livenessProbe:
+            {{- if .Values.containers.executeHttpProbesWithK8sClient }}
+            httpGet:
+              path: {{ .Values.containers.httpLivenessProbePath }}
+              port: {{ .Values.containers.httpLivenessProbePort | default .Values.deployment.containerHttpPort }}
+            {{- else }}
+            exec:
+              command:
+                - curl
+                - -f
+                - {{ .Values.containers.httpLivenessProbePath }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.containers.httpLivenessProbeInitialDelaySeconds | default "30" }}
+            periodSeconds: {{ .Values.containers.httpLivenessProbePeriodSeconds | default "10" }}
+          readinessProbe:
+            {{- if .Values.containers.executeHttpProbesWithK8sClient }}
+            httpGet:
+              path: {{ .Values.containers.httpReadinessProbePath }}
+              port: {{ .Values.containers.httpReadinessProbePort | default .Values.deployment.containerHttpPort }}
+            {{- else }}
+            exec:
+              command:
+                - curl
+                - -f
+                - {{ .Values.containers.httpReadinessProbePath }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.containers.httpReadinessProbeInitialDelaySeconds | default "30" }}
+            periodSeconds: {{ .Values.containers.httpReadinessProbePeriodSeconds | default "10" }}
+          {{- if .Values.containers.httpStartupProbePath }}
+          startupProbe:
+            {{- if .Values.containers.executeHttpProbesWithK8sClient }}
+            httpGet:
+              path: {{ .Values.containers.httpStartupProbePath }}
+              port: {{ .Values.containers.httpStartupProbePort | default .Values.deployment.containerHttpPort }}
+            {{- else }}
+            exec:
+              command:
+                - curl
+                - -f
+                - --max-time
+                - "3"
+                - {{ .Values.containers.httpStartupProbePath }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.containers.httpStartupProbeInitialDelaySeconds | default "10" }}
+            periodSeconds: {{ .Values.containers.httpStartupProbePeriodSeconds | default "1" }}
+            failureThreshold: {{ .Values.containers.httpStartupProbeFailureThreshold | default "600" }}
+          {{- end }}
+          resources:
+            {{- if .Values.jvm.enabled }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: "256Mi"
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ add .Values.jvm.memory.heap .Values.jvm.memory.heap .Values.jvm.memory.metaspace .Values.jvm.memory.nonMethodCodeHeapSize .Values.jvm.memory.profiledCodeHeapSize .Values.jvm.memory.nonProfiledCodeHeapSize .Values.jvm.memory.buffer | printf "%dMi" }}
+            {{ else if .Values.resources }}
+            {{- toYaml .Values.resources | nindent 12 }}
+            {{ else }}
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"
+            limits:
+              memory: "1Gi"
+            {{- end }}
+          env:
+            {{- if .Values.datadogEnabled }}
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+            - name: DD_LOGS_INJECTION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/logs_injection']
+            - name: DD_PROFILING_ENABLED
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/profiling_enabled']
+            {{- if eq .Values.serviceType "java" }}
+            - name: JDK_JAVA_OPTIONS
+              value: {{ range $e := .Values.env}}{{- if eq $e.name "JDK_JAVA_OPTIONS"}}{{ $e.value }}{{ $_ := set $e "name" "ORIGINAL_JDK_JAVA_OPTIONS"}}{{- end}}{{end}} {{ include "ddAgentJavaOptions" .}}
+            {{- else if eq .Values.serviceType "python" }}
+            - name: DD_REMOTE_CONFIGURATION_ENABLED
+              value: "false"
+            {{- end }}
+
+            {{- end }}
+            {{- if .Values.persistence.mongo.enabled }}
+            - name: spring.data.mongodb.database
+              value: {{ .Release.Name }}
+            {{- end }}
+            {{- if .Values.kafka.enabled }}
+            - name: spring.kafka.bootstrap-servers
+              value: {{ required "Kafka bootstrap servers not provided" .Values.kafka.cluster.bootstrapServers }}
+            - name: spring.kafka.streams.properties.bootstrap.servers
+              value: {{ required "Kafka bootstrap servers not provided" .Values.kafka.cluster.bootstrapServers }}
+            - name: spring.kafka.producer.properties.schema.registry.url
+              value: {{ required "Schema Registry URL not provided" .Values.kafka.schemaRegistry.cluster.url }}
+            - name: spring.kafka.consumer.properties.schema.registry.url
+              value: {{ required "Schema Registry URL not provided" .Values.kafka.schemaRegistry.cluster.url }}
+            - name: spring.kafka.streams.properties.schema.registry.url
+              value: {{ required "Schema Registry URL not provided" .Values.kafka.schemaRegistry.cluster.url }}
+            - name: spring.kafka.properties.schema.registry.url
+              value: {{ required "Schema Registry URL not provided" .Values.kafka.schemaRegistry.cluster.url }}
+            - name: spring.kafka.properties.security.protocol
+              value: PLAINTEXT
+            - name: spring.kafka.properties.sasl.mechanism
+              value: PLAIN
+            - name: spring.kafka.properties.client.dns.lookup
+              value: use_all_dns_ips
+            # - name: spring.kafka.properties.basic.auth.credentials.source
+            #   value: USER_INFO
+            # - name: spring.kafka.producer.properties.basic.auth.credentials.source
+            #   value: USER_INFO
+
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ required "Kafka bootstrap servers not provided" .Values.kafka.cluster.bootstrapServers }}
+            - name: SCHEMA_REGISTRY_URL
+              value: {{ required "Schema Registry URL not provided" .Values.kafka.schemaRegistry.cluster.url }}
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: PLAINTEXT
+            - name: KAFKA_SASL_MECHANISM
+              value: PLAIN
+
+
+            {{- range $topic := .Values.kafka.topics }}
+            - name: topic-name-{{ $topic.name | splitList "." | last }}
+              value: {{ $topic.name }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.jvm.enabled }}
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ range $e2 := .Values.env}}{{- if eq $e2.name "JAVA_TOOL_OPTIONS"}}{{ $e2.value }}{{ $_ := set $e2 "name" "ORIGINAL_JAVA_TOOL_OPTIONS"}}{{- end}}{{end}} {{ include "javaToolOptions" . }}
+            {{- end }}
+            {{ with .Values.env }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.persistence.mongo.enabled }}
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "microservice.fullname" . }}-mongodb-admin-{{ include "microservice.fullname" . }}
+                  key: connectionString.standardSrv
+            {{- end }}
+            - name: DEPLOYMENT_ENVIRONMENT
+              value: {{ .Values.deploymentEnvironment }}
+
+          envFrom:
+            {{ if eq (include "secrets.enabled" .) "yes" -}}
+            - secretRef:
+                name: {{ include "microservice.fullname" . }}
+            {{- end }}
+            {{ with .Values.envFrom }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          args:
+            {{ with .Values.args }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+      volumes:
+        {{ if eq (include "secrets.enabled" .) "yes" -}}
+        - name: {{ required "Secrets volume name required" .Values.secrets.volume.name }}
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ include "microservice.fullname" . }}
+        {{- end }}
+        {{- if .Values.deployment.persistentVolume.enabled }}
+        - name: pd-{{ include "microservice.fullname" . }}
+          persistentVolumeClaim:
+            claimName: pvc-{{ include "microservice.fullname" . }}
+        {{- end }}
+        {{- if .Values.configVolume }}
+        - name: {{ required "configVolume.name is required" .Values.configVolume.name }}
+          configMap:
+            name: {{ include "microservice.fullname" . }}
+        {{- end }}
+        {{- with .Values.volumes -}}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

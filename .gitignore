@@ -1,0 +1,7 @@
+# Chart dependencies
+**/charts/**/*.tgz
+**/.DS_Store
+# Intellij generated files
+.idea
+
+tmp

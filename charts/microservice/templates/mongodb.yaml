@@ -1,0 +1,77 @@
+{{- if .Values.persistence.mongo.enabled }}
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: {{ include "microservice.fullname" . }}-mongodb
+spec:
+  members: 3
+  type: ReplicaSet
+  version: "6.0.5"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: {{ include "microservice.fullname" . }}
+      db: admin
+      passwordSecretRef: # a reference to the secret that will be used to generate the user's password
+        name: {{ include "microservice.fullname" . }}-mongo-password
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+        - name: readWrite
+          db: {{ include "microservice.fullname" . }}
+      scramCredentialsSecretName: {{ include "microservice.fullname" . }}-mongo-scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+
+# the user credentials will be generated from this secret
+# once the credentials are generated, this secret is no longer required
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "microservice.fullname" . }}-mongo-password
+type: Opaque
+stringData:
+  password: {{ randAlphaNum 24 | nospace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongodb-database
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mongodb-database
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - patch
+      - delete
+      - get
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mongodb-database
+subjects:
+  - kind: ServiceAccount
+    name: mongodb-database
+roleRef:
+  kind: Role
+  name: mongodb-database
+  apiGroup: rbac.authorization.k8s.io
+{{- end}}

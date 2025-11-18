@@ -1,0 +1,218 @@
+replicaCount: 1
+microserviceName: "microservice"
+# deploymentEnvironment valid values are: workload/development/staging/production
+# if not sure what to use, leave as default
+deploymentEnvironment: "development"
+# deploymentEnvironmentID is used only when deploymentEnvironment is set to workload.
+# This is a special type of field used only for hot-dev environments.
+deploymentEnvironmentID: ""
+
+serviceType: java # Defines the type of service. Acceptable values: 'java', 'python'. This setting determines the specific configurations to be applied, such as the selection of the instrumentation library injected by the DataDog Admission Controller.
+
+image:
+  pullPolicy: IfNotPresent
+  tag: ""
+  repository: ""
+
+# Properties to be added in a configmap. Both inline key-value pairs and raw files are suported
+config: {}
+rawConfig: {}
+
+configVolume: {}
+
+containers:
+  # if enabled the http probe will be configured with httpGet instead of curl
+  executeHttpProbesWithK8sClient: false
+  # containers.httpLivenessProbePath is the path to the k8s liveness HTTP endpoint exposed by the container
+  httpLivenessProbePath: /
+  httpLivenessProbeInitialDelaySeconds: 60
+  # How often (in seconds) to perform the probe. Default to 10 seconds. The minimum value is 1.
+  httpLivenessProbePeriodSeconds: 10
+  httpLivenessProbePort:
+  # containers.httpReadinessProbePath is the path to the k8s readiness HTTP endpoint exposed by the container
+  httpReadinessProbePath: /
+  httpReadinessProbeInitialDelaySeconds: 60
+  # How often (in seconds) to perform the probe. Default to 10 seconds. The minimum value is 1.
+  httpReadinessProbePeriodSeconds: 10
+  httpReadinessProbePort:
+  # containers.httpStartupProbePath is the path to the k8s startup HTTP endpoint exposed by the container
+  httpStartupProbePath:
+  httpStartupProbeInitialDelaySeconds: 10
+  # How often (in seconds) to perform the probe. Default to 10 seconds. The minimum value is 1.
+  httpStartupProbePeriodSeconds: 1
+  httpStartupProbePort:
+  # Number of times to retry before marking as failed
+  httpStartupProbeFailureThreshold: 600
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # List of resources that the service account can create, update, and delete
+  cudResources: []
+
+podAnnotations: {}
+
+podSecurityContext: {} # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  plugins: []
+
+deployment:
+  containerHttpPort: 8080
+  # defines the container ports for the deployment
+  ports: {}
+
+  # Defines the properties needed to define a PVC and bind it into the pod container
+  persistentVolume:
+    # If set to true a PVC will be generated with the respective size and storageClass and it will be bound into the container at the respective mount path
+    enabled: false
+    storageSize: 10Gi
+    claimStorageClass: local-path
+    containerMountPath: /persistent_store
+
+ingress:
+  enabled: false
+  annotations: {}
+  className:
+  middlewares:
+    auth: 
+      enabled: true
+    acl: 
+      enabled: true
+    stripPath: 
+      enabled: false
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+  
+resources:
+  # The default limits and resources are set in deployment.yaml.
+  # It is mandatory to uncomment and edit those limits to match your service requirements!
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "2000m"
+    memory: "1Gi"
+
+jvm:
+  enabled: false
+  garbageCollector: -XX:+UseG1GC
+  # values in Mi
+  memory:
+    heap: 128
+    metaspace: 256
+    compressedClassSpaceSize: 64
+    nonMethodCodeHeapSize: 5
+    profiledCodeHeapSize: 48
+    nonProfiledCodeHeapSize: 48
+    buffer: 128 # needed for Heap dumps in case of OOM
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+tolerations: []
+
+topologySpread:
+  enabled: true
+  zoneMaxSkew: 1
+  hostMaxSkew: 1
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - '{{ include "microservice.fullname" . }}'
+          topologyKey: kubernetes.io/hostname
+
+env: []
+
+envFrom: []
+
+args: []
+
+certificate:
+  enabled: false
+  commonName: ""
+  dnsNames: []
+  clusterIssuer: ""
+  issuer: ""
+
+persistence:
+  mongo:
+    enabled: false
+    additionalConnectionOptions: {}
+
+kafka:
+  enabled: false
+  topics:
+    []
+    # - name: domain.topic1 # name of the topic
+    #   operations: # list of allowed operations from the service to the kafka topic. only "write" and "read" values are allowed.
+    #     - write
+    #     - read
+    #   partitions: 2 # optional partitions count for the topic. if not specified kafka.partitions will be used.
+    #   config: # optional topic configurations, as documented in https://docs.confluent.io/cloud/current/clusters/broker-config.html#custom-topic-settings-for-all-cluster-types-supported-by-kafka-rest-api-and-terraform-provider
+    #     prop1: value1
+    #     prop2: value2
+  partitions: ""
+  replicas: ""
+  cluster:
+    bootstrapServers: ""
+    name: ""
+  schemaRegistry:
+    cluster:
+      url: ""
+
+# Kubernetes default values for deployment.spec.strategy
+deploymentStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: "25%"
+    maxUnavailable: "25%"
+
+volumes: []
+volumeMounts: []
+
+customIngress:
+  enabled: false
+  config: {}
+
+initContainers: []
+
+pdb:
+  enabled: true
+  minAvailable: 1
+

@@ -1,0 +1,26 @@
+# {{- if .Values.kafka.enabled }}
+# apiVersion: kafka.strimzi.io/v1beta2
+# kind: KafkaUser
+# metadata:
+#   name: {{ include "microservice.fullname" . }}
+#   namespace: kafka
+#   labels:
+#     strimzi.io/cluster: {{ .Values.kafka.cluster.name }}
+# spec:
+#   authentication:
+#     type: scram-sha-512
+#   authorization:
+#     type: simple
+#     acls:
+#       {{- range .Values.kafka.topics }}
+#       {{- $topic := .name }}
+#       {{- range .operations }}
+#       - resource:
+#           type: topic
+#           name: {{ $topic }}
+#           patternType: literal
+#         operation: {{ . | title }}
+#         type: allow
+#       {{- end }}
+#       {{- end }}
+# {{- end }}
