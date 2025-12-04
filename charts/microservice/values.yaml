@@ -173,6 +173,7 @@ certificate:
 persistence:
   mongo:
     enabled: false
+    encryptedPassword: ""
     additionalConnectionOptions: {}
 
 kafka:

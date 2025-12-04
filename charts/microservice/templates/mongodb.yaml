@@ -30,13 +30,16 @@ spec:
 # the user credentials will be generated from this secret
 # once the credentials are generated, this secret is no longer required
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
 metadata:
   name: {{ include "microservice.fullname" . }}-mongo-password
-type: Opaque
-stringData:
-  password: {{ randAlphaNum 24 | nospace }}
+spec:
+  encryptedData:
+    password: {{ .Values.persistence.mongo.encryptedPassword }}
+  template:
+    metadata:
+      name: {{ include "microservice.fullname" . }}-mongo-password
 ---
 apiVersion: v1
 kind: ServiceAccount
