@@ -76,7 +76,7 @@ service:
   type: ClusterIP
   port: 80
   targetPort: 8080
-  plugins: []
+  annotations: {}
 
 deployment:
   containerHttpPort: 8080

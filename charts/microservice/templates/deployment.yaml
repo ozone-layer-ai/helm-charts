@@ -68,10 +68,6 @@ spec:
             - mountPath: {{ .Values.deployment.persistentVolume.containerMountPath }}
               name: pd-{{ include "microservice.fullname" . }}
           {{- end }}
-          {{ if eq (include "secrets.enabled" .) "yes" }}
-            - mountPath: {{ required "Secrets volume mount required" .Values.secrets.volume.mount }}
-              name: {{ required "Secrets volume name required" .Values.secrets.volume.name }}
-          {{- end }}
           {{- if .Values.configVolume }}
             - name: {{  required "configVolume.name is a required value" .Values.configVolume.name }}
               mountPath: {{ required "configVolume.mount is a required value" .Values.configVolume.mount }}

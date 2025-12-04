@@ -57,38 +57,6 @@ Create the name of the service account to use
 {{- end }}
 
 
-{{/*
-This function checks if at least one of the conditions is true:
-1. The list Values.secrets.objects is not empty.
-2. The boolean field Values.persistence.mongo.enabled is true.
-3. The boolean field Values.persistence.rds.enabled is true.
-4. The boolean field Values.kafka.enabled is true
-*/}}
-{{- define "secrets.enabled" -}}
-{{- $result := "no" -}}
-{{- if or (ne (len .Values.secrets.keys) 0) -}}
-{{- $result = "yes" -}}
-{{- end -}}
-{{- $result -}}
-{{- end -}}
-
-
-{{/*
-This function checks if at least one infrastructure component should be enabled.
-The conditions are:
-1. is secrets.enabled
-*/}}
-{{- define "infrastructure.enabled" -}}
-{{- $result := "no" -}}
-{{ if eq (include "secrets.enabled" .) "yes" -}}
-{{- $result = "yes" -}}
-{{- end -}}
-{{- $result -}}
-{{- end -}}
-
-
-
-
 {{- define "kafkaTopicsToString" -}}
 {{- $partitions := .Values.kafka.partitions -}}
 {{- $parsedJson := .Values.kafka.topics -}}
