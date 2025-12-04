@@ -1,0 +1,8 @@
+apiVersion: v2
+name: external-dns-wrapper
+version: 0.1.0
+description: A Helm chart for Kubernetes
+dependencies:
+  - name: external-dns
+    version: 1.19.0
+    repository: https://kubernetes-sigs.github.io/external-dns
