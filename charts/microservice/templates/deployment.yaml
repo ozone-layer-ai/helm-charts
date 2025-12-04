@@ -4,11 +4,6 @@ metadata:
   name: {{ include "microservice.fullname" . }}
   labels:
     {{- include "microservice.labels" . | nindent 4 }}
-    {{- if .Values.datadogEnabled }}
-    tags.datadoghq.com/service: {{ include "microservice.fullname" . }}
-    tags.datadoghq.com/version: {{ default .Chart.AppVersion .Values.image.tag }}
-    tags.datadoghq.com/env: {{ .Values.deploymentEnvironment }}
-    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -35,14 +30,6 @@ spec:
       {{- end }}
       labels:
         {{- include "microservice.selectorLabels" . | nindent 8 }}
-        {{- if .Values.datadogEnabled }}
-        tags.datadoghq.com/service: {{ include "microservice.fullname" . }}
-        tags.datadoghq.com/version: {{ default .Chart.AppVersion .Values.image.tag }}
-        tags.datadoghq.com/env: {{ .Values.deploymentEnvironment }}
-        admission.datadoghq.com/enabled: "true"
-        tags.datadoghq.com/logs_injection: "true"
-        tags.datadoghq.com/profiling_enabled: "true"
-        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -168,40 +155,16 @@ spec:
               memory: "1Gi"
             {{- end }}
           env:
-            {{- if .Values.datadogEnabled }}
-            - name: DD_ENV
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/env']
-            - name: DD_SERVICE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/service']
-            - name: DD_VERSION
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/version']
-            - name: DD_LOGS_INJECTION
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/logs_injection']
-            - name: DD_PROFILING_ENABLED
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/profiling_enabled']
-            {{- if eq .Values.serviceType "java" }}
-            - name: JDK_JAVA_OPTIONS
-              value: {{ range $e := .Values.env}}{{- if eq $e.name "JDK_JAVA_OPTIONS"}}{{ $e.value }}{{ $_ := set $e "name" "ORIGINAL_JDK_JAVA_OPTIONS"}}{{- end}}{{end}} {{ include "ddAgentJavaOptions" .}}
-            {{- else if eq .Values.serviceType "python" }}
-            - name: DD_REMOTE_CONFIGURATION_ENABLED
-              value: "false"
-            {{- end }}
-
-            {{- end }}
             {{- if .Values.persistence.mongo.enabled }}
             - name: spring.data.mongodb.database
               value: {{ .Release.Name }}
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "microservice.fullname" . }}-mongodb-admin-{{ include "microservice.fullname" . }}
+                  key: connectionString.standardSrv
             {{- end }}
+
             {{- if .Values.kafka.enabled }}
             - name: spring.kafka.bootstrap-servers
               value: {{ required "Kafka bootstrap servers not provided" .Values.kafka.cluster.bootstrapServers }}
@@ -248,21 +211,10 @@ spec:
             {{ with .Values.env }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
-            {{- if .Values.persistence.mongo.enabled }}
-            - name: SPRING_DATA_MONGODB_URI
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "microservice.fullname" . }}-mongodb-admin-{{ include "microservice.fullname" . }}
-                  key: connectionString.standardSrv
-            {{- end }}
             - name: DEPLOYMENT_ENVIRONMENT
               value: {{ .Values.deploymentEnvironment }}
 
           envFrom:
-            {{ if eq (include "secrets.enabled" .) "yes" -}}
-            - secretRef:
-                name: {{ include "microservice.fullname" . }}
-            {{- end }}
             {{ with .Values.envFrom }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -272,14 +224,6 @@ spec:
             {{- end }}
 
       volumes:
-        {{ if eq (include "secrets.enabled" .) "yes" -}}
-        - name: {{ required "Secrets volume name required" .Values.secrets.volume.name }}
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: {{ include "microservice.fullname" . }}
-        {{- end }}
         {{- if .Values.deployment.persistentVolume.enabled }}
         - name: pd-{{ include "microservice.fullname" . }}
           persistentVolumeClaim:
