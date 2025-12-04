@@ -204,8 +204,9 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: {{ range $e2 := .Values.env}}{{- if eq $e2.name "JAVA_TOOL_OPTIONS"}}{{ $e2.value }}{{ $_ := set $e2 "name" "ORIGINAL_JAVA_TOOL_OPTIONS"}}{{- end}}{{end}} {{ include "javaToolOptions" . }}
             {{- end }}
-            {{ with .Values.env }}
-              {{- toYaml . | nindent 12 }}
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ tpl .value $ | quote }}
             {{- end }}
             - name: DEPLOYMENT_ENVIRONMENT
               value: {{ .Values.deploymentEnvironment }}
