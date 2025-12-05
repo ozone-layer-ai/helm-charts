@@ -1,0 +1,14 @@
+kafka:
+  name: kafka-cluster
+  version: 4.1.0
+  metadataVersion: 4.1-IV1
+  listeners: []
+  config: {}
+
+nodePool:
+  name: dual-role
+  replicas: 1
+  roles: []
+  storage:
+    size: 100Gi
+    deleteClaim: false

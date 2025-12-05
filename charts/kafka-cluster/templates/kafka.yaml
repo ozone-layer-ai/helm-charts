@@ -1,0 +1,25 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ include "kafka.name" . }}
+spec:
+  kafka:
+    version: {{ .Values.kafka.version }}
+    metadataVersion: {{ .Values.kafka.metadataVersion }}
+
+    listeners:
+{{- range .Values.kafka.listeners }}
+      - name: {{ .name }}
+        port: {{ .port }}
+        type: {{ .type }}
+        tls: {{ .tls }}
+{{- end }}
+
+    config:
+{{- range $key, $value := .Values.kafka.config }}
+      {{ $key }}: {{ $value }}
+{{- end }}
+
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

@@ -1,0 +1,20 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: {{ .Values.nodePool.name }}
+  labels:
+    strimzi.io/cluster: {{ include "kafka.name" . }}
+spec:
+  replicas: {{ .Values.nodePool.replicas }}
+  roles:
+  {{- range .Values.nodePool.roles }}
+    - {{ . }}
+  {{- end }}
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: {{ .Values.nodePool.storage.size }}
+        deleteClaim: {{ .Values.nodePool.storage.deleteClaim }}
+        kraftMetadata: shared
