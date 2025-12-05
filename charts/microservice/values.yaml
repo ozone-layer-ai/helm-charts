@@ -82,6 +82,9 @@ deployment:
   containerHttpPort: 8080
   # defines the container ports for the deployment
   ports: {}
+  template:
+    spec:
+      additional: {}
 
   # Defines the properties needed to define a PVC and bind it into the pod container
   persistentVolume:
