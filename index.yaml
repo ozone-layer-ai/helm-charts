@@ -11,7 +11,30 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/cloudflared-0.1.0/cloudflared-0.1.0.tgz
     version: 0.1.0
+  external-dns-wrapper:
+  - apiVersion: v2
+    created: "2025-12-05T06:30:56.085755958Z"
+    dependencies:
+    - name: external-dns
+      repository: https://kubernetes-sigs.github.io/external-dns
+      version: 1.19.0
+    description: A Helm chart for Kubernetes
+    digest: 2f876e19414062a4903340dd6858727e77560454b02fbc4902b2b172b01a481e
+    name: external-dns-wrapper
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/external-dns-wrapper-0.1.0/external-dns-wrapper-0.1.0.tgz
+    version: 0.1.0
   microservice:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-12-05T06:30:56.322771812Z"
+    description: A Helm chart for Kubernetes
+    digest: 09966c273d4fcf18236adbc0ee4527d5c9bfb42282b92beaf1bde740e21f8c58
+    name: microservice
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.2.2/microservice-0.2.2.tgz
+    version: 0.2.2
   - apiVersion: v2
     appVersion: 1.16.0
     created: "2025-12-04T08:30:30.016597627Z"
@@ -42,4 +65,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.1.0/microservice-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-04T08:30:30.016610702Z"
+generated: "2025-12-05T06:30:56.322787962Z"
