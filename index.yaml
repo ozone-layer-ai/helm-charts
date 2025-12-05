@@ -24,6 +24,17 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/external-dns-wrapper-0.1.0/external-dns-wrapper-0.1.0.tgz
     version: 0.1.0
+  kafka-cluster:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-12-05T11:25:41.578877349Z"
+    description: A Helm chart for Kubernetes
+    digest: a8eb68ae607ac1a0ea21bce4ab30d8031e3972964f2ee55877decad7e8eeb197
+    name: kafka-cluster
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/kafka-cluster-0.1.0/kafka-cluster-0.1.0.tgz
+    version: 0.1.0
   microservice:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -75,4 +86,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.1.0/microservice-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-05T08:42:23.04266905Z"
+generated: "2025-12-05T11:25:41.57889345Z"
