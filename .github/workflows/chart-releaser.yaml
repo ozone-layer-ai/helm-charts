@@ -22,6 +22,19 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      
+      - name: Add all chart dependency repositories
+        run: |
+          for chart in charts/*; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              repos=$(yq '.dependencies[].repository' "$chart/Chart.yaml")
+              for repo in $repos; do
+                name=$(basename $repo | tr . -)
+                helm repo add $name $repo || true
+              done
+              helm dependency update "$chart"
+            fi
+          done
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
