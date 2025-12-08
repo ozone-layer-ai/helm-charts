@@ -1,0 +1,73 @@
+apiVersion: kamaji.clastix.io/v1alpha1
+kind: TenantControlPlane
+metadata:
+  name: {{ .Values.tenantControlPlane.name | required "tenantControlPlane.name is required" }}
+  labels:
+    tenant.clastix.io: {{ .Values.tenantControlPlane.name }}
+spec:
+  dataStore: {{ .Values.tenantControlPlane.dataStore | default "default" }}
+  controlPlane:
+    deployment:
+      replicas: 1
+      additionalMetadata:
+        labels:
+          tenant.clastix.io: {{ .Values.tenantControlPlane.name }}
+      extraArgs:
+        apiServer: []
+        controllerManager: []
+        scheduler: []
+      resources:
+        apiServer:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits: {}
+        controllerManager:
+          requests:
+            cpu: 125m
+            memory: 256Mi
+          limits: {}
+        scheduler:
+          requests:
+            cpu: 125m
+            memory: 256Mi
+          limits: {}
+    ingress:
+      ingressClassName: {{ .Values.tenantControlPlane.ingress.className }}
+      hostname: {{ .Values.tenantControlPlane.ingress.hostname }}
+      additionalMetadata:
+        annotations:
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          external-dns.alpha.kubernetes.io/hostname: {{ .Values.tenantControlPlane.ingress.hostname }}
+          external-dns.alpha.kubernetes.io/target: {{ .Values.tenantControlPlane.ingress.tunnelId }}.cfargotunnel.com
+
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-cloudflare-real-ip@kubernetescrd, {{ .Release.Namespace }}-{{ .Release.Name }}-ip-acl@kubernetescrd
+          traefik.ingress.kubernetes.io/service.serversscheme: https
+          traefik.ingress.kubernetes.io/service.insecureskipverify: "true"
+    service:
+      serviceType: ClusterIP
+      additionalMetadata:
+        annotations:
+          traefik.ingress.kubernetes.io/service.serversscheme: https
+          traefik.ingress.kubernetes.io/service.serverstransport: traefik-skipverify@kubernetescrd
+  kubernetes:
+    version: {{ .Values.tenantControlPlane.kubernetes.version }}
+    kubelet:
+      cgroupfs: systemd
+    admissionControllers:
+      - ResourceQuota
+      - LimitRanger
+  networkProfile:
+    certSANs:
+      - {{ .Values.tenantControlPlane.ingress.hostname }}
+  addons:
+    coreDNS: {}
+    kubeProxy: {}
+    konnectivity:
+      server:
+        port: 8132
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits: {}

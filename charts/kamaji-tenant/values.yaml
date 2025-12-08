@@ -1,0 +1,13 @@
+tenantControlPlane:
+  name: ""
+  dataStore: default
+  
+  ingress:
+    className: traefik
+    tunnelId: ""
+    hostname: ""
+    ipAllowList: []
+  
+  kubernetes:
+    version: "v1.34.0"
+  

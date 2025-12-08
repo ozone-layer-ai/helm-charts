@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Release.Name }}-ip-acl
+spec:
+  ipAllowList:
+    sourceRange:
+      {{- with .Values.tenantControlPlane.ingress.ipAllowList | required "tenantControlPlane.ingress.ipAllowList is required"}}
+      {{- toYaml . | nindent 6 }}
+      {{- end}}
+    ipStrategy:
+      depth: 1
+      excludedIPs:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        - "192.168.0.0/16"
