@@ -35,6 +35,17 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/kafka-cluster-0.1.0/kafka-cluster-0.1.0.tgz
     version: 0.1.0
+  kamaji-tenant:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-12-08T15:19:56.557246348Z"
+    description: A Helm chart for deploying Kamaji tenant control planes
+    digest: 4564d3ce3a719f408d0bce46035a400d7d9a97aac37d54cc472faec749613faf
+    name: kamaji-tenant
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/kamaji-tenant-0.1.0/kamaji-tenant-0.1.0.tgz
+    version: 0.1.0
   microservice:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -86,4 +97,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.1.0/microservice-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-05T11:25:41.57889345Z"
+generated: "2025-12-08T15:19:56.557260875Z"
