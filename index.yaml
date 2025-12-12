@@ -49,6 +49,16 @@ entries:
   microservice:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-12-12T15:14:22.571704299Z"
+    description: A Helm chart for Kubernetes
+    digest: be2e5dce0e7933ab850ba3c3c9927da833b0f0d3e2899e816fb58b3c6daa7a94
+    name: microservice
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.2.4/microservice-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-12-05T08:42:23.042648973Z"
     description: A Helm chart for Kubernetes
     digest: 242c017b974b2f45ff978f6ce3559ae89181e30b504740dc1c68588f40153efd
@@ -97,4 +107,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.1.0/microservice-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-08T15:19:56.557260875Z"
+generated: "2025-12-12T15:14:22.571727302Z"
