@@ -5,6 +5,7 @@
 {{- $defaultReplicas := .Values.kafka.replicas | default 1 -}}
 
 {{- range .Values.kafka.topics }}
+{{- if (has "create" .operations) }}
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
@@ -16,5 +17,6 @@ metadata:
 spec:
   partitions: {{ .partitions | default $defaultPartitions }}
   replicas: {{ .replicas | default $defaultReplicas }}
+{{- end }}
 {{- end }}
 {{- end }}
