@@ -220,3 +220,4 @@ pdb:
   enabled: true
   minAvailable: 1
 
+secrets: {} # key: encryptedValue
