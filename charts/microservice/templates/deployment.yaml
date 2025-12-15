@@ -216,8 +216,12 @@ spec:
               value: {{ .Values.deploymentEnvironment }}
 
           envFrom:
-            {{ with .Values.envFrom }}
+            {{- with .Values.envFrom }}
               {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.secrets }}
+            - secretRef:
+              name: {{ include "microservice.fullname" . }}
             {{- end }}
           args:
             {{ with .Values.args }}
