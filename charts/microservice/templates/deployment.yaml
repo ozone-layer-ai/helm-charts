@@ -221,7 +221,7 @@ spec:
             {{- end }}
             {{- if .Values.secrets }}
             - secretRef:
-              name: {{ include "microservice.fullname" . }}
+                name: {{ include "microservice.fullname" . }}
             {{- end }}
           args:
             {{ with .Values.args }}
