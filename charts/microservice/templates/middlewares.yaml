@@ -1,17 +1,19 @@
-{{- if eq .Values.ingress.className "traefik" -}}
-{{- if .Values.ingress.middlewares.stripPath.enabled -}}
+{{- if include "microservice.hasChainedMiddlewares" . }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-prefix-{{.Release.Name}}
+  name: {{ include "microservice.fullname" .}}-chain
 spec:
-  stripPrefix:
-    prefixes:
-      {{- range .Values.ingress.hosts }}
-        {{- range .paths }}
-      - {{ .path }}
-        {{- end }}
-      {{- end }}
-{{- end -}}
-{{- end -}}
+  chain:
+    middlewares:
+    
+    {{- if .Values.httproute.middlewares.acl.enabled }}
+    - name: traefik-console-ip-acl@kubernetescrd
+    {{- end -}}
+
+    {{- if .Values.httproute.middlewares.auth.enabled }}
+    - name: traefik-oauth2-proxy@kubernetescrd
+    {{- end -}}
+
+{{- end}}

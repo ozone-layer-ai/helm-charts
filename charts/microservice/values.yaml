@@ -94,22 +94,19 @@ deployment:
     claimStorageClass: local-path
     containerMountPath: /persistent_store
 
-ingress:
+httproute:
   enabled: false
+
+  gateway:
+    name:
+    namespace:
+    sectionName:
+
+  hostnames: []
+  rules: []
+  middlewares: {}
   annotations: {}
-  className:
-  middlewares:
-    auth: 
-      enabled: true
-    acl: 
-      enabled: true
-    stripPath: 
-      enabled: false
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-  
+
 resources:
   # The default limits and resources are set in deployment.yaml.
   # It is mandatory to uncomment and edit those limits to match your service requirements!

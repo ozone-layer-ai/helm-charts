@@ -83,21 +83,12 @@ Create the name of the service account to use
 -Xms{{.Values.jvm.memory.heap}}m -Xmx{{.Values.jvm.memory.heap}}m -XX:MetaspaceSize={{.Values.jvm.memory.metaspace}}m -XX:MaxMetaspaceSize={{.Values.jvm.memory.metaspace}}m -XX:CompressedClassSpaceSize={{.Values.jvm.memory.compressedClassSpaceSize}}m -XX:+TieredCompilation -XX:+SegmentedCodeCache -XX:NonNMethodCodeHeapSize={{.Values.jvm.memory.nonMethodCodeHeapSize}}m -XX:ProfiledCodeHeapSize={{.Values.jvm.memory.profiledCodeHeapSize}}m -XX:NonProfiledCodeHeapSize={{.Values.jvm.memory.nonProfiledCodeHeapSize}}m -XX:ReservedCodeCacheSize={{ add .Values.jvm.memory.nonMethodCodeHeapSize .Values.jvm.memory.profiledCodeHeapSize .Values.jvm.memory.nonProfiledCodeHeapSize}}m
 {{- end -}}
 
-{*Datadog agent options*}
-{{- define "ddAgentJavaOptions" -}}
--Ddatadog.slf4j.simpleLogger.dateTimeFormat="yyyy-MM-dd HH:mm:ss.SSS" -Ddatadog.slf4j.simpleLogger.logFile=System.out
+{{/*
+Check if any security middleware is enabled.
+Returns "true" if either ACL or Auth is enabled, otherwise empty string.
+*/}}
+{{- define "microservice.hasChainedMiddlewares" -}}
+  {{- if or .Values.httproute.middlewares.acl.enabled .Values.httproute.middlewares.auth.enabled -}}
+    true
+  {{- end -}}
 {{- end -}}
-
-{{- define "pluginNames" -}}
-{{- $fullname := .fullname }}
-{{- $plugins := .plugins -}}
-{{- $pluginNames := list -}}
-{{- range $plugin := $plugins -}}
-{{- $pluginNames = append $pluginNames (printf "%s-%s" $fullname $plugin.name) -}}
-{{- end -}}
-{{- join ", " $pluginNames -}}
-{{- end -}}
-
-{{- define "generateTerraformSource" -}}
-{{- printf "%s?ref=%s" .Values.terraform.source.address .Values.terraform.source.ref -}}
-{{- end }}
