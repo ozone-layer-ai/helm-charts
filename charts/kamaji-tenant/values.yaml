@@ -2,12 +2,14 @@ tenantControlPlane:
   name: ""
   dataStore: default
   
-  ingress:
-    className: traefik
-    tunnelId: ""
-    hostname: ""
-    ipAllowList: []
-  
   kubernetes:
     version: "v1.34.0"
   
+  gateway:
+    parentRef:
+      name: traefik-gateway
+      namespace: traefik
+      sectionName: k8s
+
+    ipAllowList: []
+    hostname:
