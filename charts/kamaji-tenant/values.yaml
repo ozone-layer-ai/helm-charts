@@ -7,9 +7,28 @@ tenantControlPlane:
   
   gateway:
     parentRef:
-      name: traefik-gateway
+      name:
       namespace: traefik
       sectionName: k8s
 
     ipAllowList: []
     hostname:
+    cnameTarget: bd3d53d9-0e23-4daf-be67-a3af6a5e4075.cfargotunnel.com
+
+workers:
+  joinCmd:
+
+  cloud:
+    gcp:
+      region:
+      nodeType:
+      min:
+      max:
+
+flavor: 
+
+cluster:
+  secrets:
+    name:
+    server:
+    config:
