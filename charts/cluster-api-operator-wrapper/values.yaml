@@ -1,0 +1,17 @@
+# Default values for cluster-api-operator-wrapper.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+sealedSecrets: {}
+# sealedSecrets allows defining multiple Bitnami SealedSecrets.
+# Each top-level key becomes the SealedSecret name.
+#
+# Example:
+# sealedSecrets:
+#   aws-credentials:
+#     namespace: capi-operator-system # optional, defaults to the release namespace
+#     encryptedData:
+#       AWS_B64ENCODED_CREDENTIALS: AgA...
+#   another-secret:
+#     encryptedData:
+#       token: AgB...

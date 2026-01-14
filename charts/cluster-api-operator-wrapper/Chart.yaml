@@ -1,0 +1,8 @@
+apiVersion: v2
+name: cluster-api-operator-wrapper
+version: 0.0.1
+description: A Helm chart wrapper for cluster-api-operator
+dependencies:
+  - name: cluster-api-operator
+    version: 0.24.1
+    repository: https://kubernetes-sigs.github.io/cluster-api-operator
