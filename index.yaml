@@ -11,6 +11,19 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/cloudflared-0.1.0/cloudflared-0.1.0.tgz
     version: 0.1.0
+  cluster-api-operator-wrapper:
+  - apiVersion: v2
+    created: "2026-01-14T10:24:41.621614521Z"
+    dependencies:
+    - name: cluster-api-operator
+      repository: https://kubernetes-sigs.github.io/cluster-api-operator
+      version: 0.24.1
+    description: A Helm chart wrapper for cluster-api-operator
+    digest: b2dc82b41aa97a6caa814bf6413b7ec53c071da4d4b07eca645d7fb3dddb3df7
+    name: cluster-api-operator-wrapper
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/cluster-api-operator-wrapper-0.0.1/cluster-api-operator-wrapper-0.0.1.tgz
+    version: 0.0.1
   external-dns-wrapper:
   - apiVersion: v2
     created: "2025-12-05T06:30:56.085755958Z"
@@ -147,4 +160,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.1.0/microservice-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-18T07:57:03.926942695Z"
+generated: "2026-01-14T10:24:41.621719183Z"
