@@ -5,7 +5,7 @@ metadata:
 spec:
   ipAllowList:
     sourceRange:
-      {{- with .Values.tenantControlPlane.ingress.ipAllowList | required "tenantControlPlane.ingress.ipAllowList is required"}}
+      {{- with .Values.tenantControlPlane.gateway.ipAllowList | required "tenantControlPlane.gateway.ipAllowList is required"}}
       {{- toYaml . | nindent 6 }}
       {{- end}}
     ipStrategy:

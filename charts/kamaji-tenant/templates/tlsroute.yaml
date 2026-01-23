@@ -1,0 +1,28 @@
+{{ if .Values.tenantControlPlane.gateway.parentRef.name }}
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  hostnames:
+  - {{ .Values.tenantControlPlane.gateway.hostname }}
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ .Values.tenantControlPlane.gateway.parentRef.name }}
+    namespace: {{ .Values.tenantControlPlane.gateway.parentRef.namespace }}
+    sectionName: {{ .Values.tenantControlPlane.gateway.parentRef.sectionName }}
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: {{ .Release.Name }}
+      port: 6443
+      weight: 1
+    filters:
+    - type: ExtensionRef
+      extensionRef:
+        group: traefik.io
+        kind: Middleware
+        name: {{ .Release.Name }}-ip-acl
+{{- end }}
