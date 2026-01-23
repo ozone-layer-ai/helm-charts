@@ -5,7 +5,7 @@ cloudflare:
   tunnel_token_secret_ref:
     name: ""
     key: ""
-    encrypted_token: ""
+    encrypted_token: "" # if empty the deployment would expect an already created secret in the namespace
 
 image:
   repository: cloudflare/cloudflared
