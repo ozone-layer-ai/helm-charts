@@ -190,4 +190,19 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/microservice-0.1.0/microservice-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-28T07:38:09.498282351Z"
+  node-problem-detector:
+  - apiVersion: v2
+    appVersion: 2b55d13
+    created: "2026-02-01T18:28:26.906063288Z"
+    dependencies:
+    - name: node-problem-detector
+      repository: oci://ghcr.io/deliveryhero/helm-charts
+      version: 2.4.0
+    description: A wrapper for node-problem-detector chart https://artifacthub.io/packages/helm/deliveryhero/node-problem-detector
+    digest: f0e670713e013d681316846c5a538fcc74a2749a36dd3df27d39f62a493dfa61
+    name: node-problem-detector
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/node-problem-detector-0.1.0/node-problem-detector-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-02-01T18:28:26.906101468Z"
