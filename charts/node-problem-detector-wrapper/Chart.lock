@@ -1,0 +1,6 @@
+dependencies:
+- name: node-problem-detector
+  repository: oci://ghcr.io/deliveryhero/helm-charts
+  version: 2.4.0
+digest: sha256:408c708cbea9310c4900058d701834e5d7d9d32a02bb09eeb07b21bec8afb6dd
+generated: "2026-02-01T18:15:05.860879+02:00"

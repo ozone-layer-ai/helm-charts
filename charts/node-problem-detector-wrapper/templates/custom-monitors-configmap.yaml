@@ -1,0 +1,18 @@
+{{- if .Values.customMonitors.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "node-problem-detector.fullname" . }}-custom-monitors
+  labels:
+    {{- include "node-problem-detector.labels" . | nindent 4 }}
+data:
+  {{- $path := .Values.customMonitors.path }}
+  {{- $files := .Files.Glob (printf "%s/**" $path) }}
+  {{- range $path, $_ := $files }}
+  {{- $filename := base $path }}
+  {{- if and (ne $filename "README.md") (ne $filename ".gitkeep") (not (hasSuffix ".example" $filename)) }}
+  {{ $filename }}: |-
+{{ $.Files.Get $path | indent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}
