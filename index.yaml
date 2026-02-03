@@ -205,4 +205,19 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/node-problem-detector-0.1.0/node-problem-detector-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-01T18:28:26.906101468Z"
+  node-problem-detector-wrapper:
+  - apiVersion: v2
+    appVersion: 2b55d13
+    created: "2026-02-03T07:23:22.671456046Z"
+    dependencies:
+    - name: node-problem-detector
+      repository: oci://ghcr.io/deliveryhero/helm-charts
+      version: 2.4.0
+    description: A wrapper for node-problem-detector chart https://artifacthub.io/packages/helm/deliveryhero/node-problem-detector
+    digest: 9bcb9c8c423273020aa4587bb8ee285664b55b27994dc1ab982b9fc0630ca2ee
+    name: node-problem-detector-wrapper
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/node-problem-detector-wrapper-0.2.0/node-problem-detector-wrapper-0.2.0.tgz
+    version: 0.2.0
+generated: "2026-02-03T07:23:22.671493285Z"
