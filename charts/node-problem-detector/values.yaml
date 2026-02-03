@@ -97,6 +97,10 @@ volume:
 
 priorityClassName: system-node-critical
 
+# runtimeClassName -- Runtime class to use for the pod (e.g., kata-containers, gvisor)
+# See https://kubernetes.io/docs/concepts/containers/runtime-class/
+runtimeClassName: ""
+
 securityContext:
   privileged: true
 
