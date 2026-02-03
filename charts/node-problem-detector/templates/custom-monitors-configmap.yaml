@@ -4,7 +4,10 @@ kind: ConfigMap
 metadata:
   name: {{ include "node-problem-detector.fullname" . }}-custom-monitors
   labels:
-    {{- include "node-problem-detector.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "node-problem-detector.name" . }}
+    helm.sh/chart: {{ include "node-problem-detector.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   {{- $path := .Values.customMonitors.path }}
   {{- $files := .Files.Glob (printf "%s/**" $path) }}
