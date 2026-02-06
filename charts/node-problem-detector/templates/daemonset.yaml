@@ -93,7 +93,9 @@ spec:
               mountPath: /custom-config
               readOnly: true
             {{- if and .Values.customMonitors.enabled .Values.customMonitors.volumeMount }}
-            - {{- toYaml .Values.customMonitors.volumeMount | nindent 14 }}
+            - name: {{ .Values.customMonitors.volumeMount.name }}
+              mountPath: {{ .Values.customMonitors.volumeMount.mountPath }}
+              readOnly: {{ .Values.customMonitors.volumeMount.readOnly }}
             {{- end }}
           {{- if .Values.extraVolumeMounts }}
           {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
