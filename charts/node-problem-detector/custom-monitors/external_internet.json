@@ -1,0 +1,27 @@
+{
+  "plugin": "custom",
+  "pluginConfig": {
+    "invoke_interval": "180s",
+    "timeout": "30s",
+    "max_output_length": 80,
+    "concurrency": 1
+  },
+  "source": "external-internet-monitor",
+  "metricsReporting": true,
+  "conditions": [
+    {
+      "type": "InternetConnectionDown",
+      "reason": "InternetConnectionUp",
+      "message": "Has connection to internet"
+    }
+  ],
+  "rules": [
+    {
+      "type": "permanent",
+      "condition": "InternetConnectionDown",
+      "reason": "InternetConnectionDown",
+      "path": "./custom-config/external-internet.sh",
+      "timeout": "30s"
+    }
+  ]
+}

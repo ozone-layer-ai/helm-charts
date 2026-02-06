@@ -1,0 +1,27 @@
+{
+  "plugin": "custom",
+  "pluginConfig": {
+    "invoke_interval": "180s",
+    "timeout": "120s",
+    "max_output_length": 80,
+    "concurrency": 1
+  },
+  "source": "dns-monitor",
+  "metricsReporting": true,
+  "conditions": [
+    {
+      "type": "DNSServerConnectionDown",
+      "reason": "DNSServerConnectionUp",
+      "message": "DNS server connection good"
+    }
+  ],
+  "rules": [
+    {
+      "type": "permanent",
+      "condition": "DNSServerConnectionDown",
+      "reason": "DNSServerConnectionDown",
+      "path": "./custom-config/dnsserver.sh",
+      "timeout": "120s"
+    }
+  ]
+}

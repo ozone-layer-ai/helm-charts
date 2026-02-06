@@ -1,0 +1,33 @@
+{
+  "plugin": "custom",
+  "pluginConfig": {
+    "invoke_interval": "300s",
+    "timeout": "3m",
+    "max_output_length": 80,
+    "concurrency": 1
+  },
+  "source": "interface-flap-health-checker",
+  "metricsReporting": true,
+  "conditions": [
+    {
+      "type": "NetworkFlapping",
+      "reason": "Interfaces are healthy",
+      "message": "No flapping was detected"
+    }
+  ],
+  "rules": [
+    {
+      "type": "permanent",
+      "condition": "NetworkFlapping",
+      "reason": "Interfaceflapping",
+      "path": "./custom-config/interface-flapping.sh",
+      "args": [
+        "network_flapping",
+        "8",
+        "3600",
+        "86400"
+      ],
+      "timeout": "3m"
+    }
+  ]
+}

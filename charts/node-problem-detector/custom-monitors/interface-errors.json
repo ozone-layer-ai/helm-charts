@@ -1,0 +1,27 @@
+{
+  "plugin": "custom",
+  "pluginConfig": {
+    "invoke_interval": "300s",
+    "timeout": "3m",
+    "max_output_length": 80,
+    "concurrency": 1
+  },
+  "source": "interface-error-checker",
+  "metricsReporting": true,
+  "conditions": [
+    {
+      "type": "InterfacesTXRXErrors",
+      "reason": "NoInterfacesTXRXerrors",
+      "message": "No interface errors detected"
+    }
+  ],
+  "rules": [
+    {
+      "type": "permanent",
+      "condition": "InterfacesTXRXErrors",
+      "reason": "InterfacesTXRXErrors",
+      "path": "./custom-config/interface-errors.sh",
+      "timeout": "30s"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "plugin": "custom",
+  "pluginConfig": {
+    "invoke_interval": "900s",
+    "timeout": "300s",
+    "max_output_length": 80,
+    "concurrency": 1
+  },
+  "source": "node-connectivity-monitor",
+  "metricsReporting": true,
+  "conditions": [
+    {
+      "type": "NodeNetworkConnectivityDown",
+      "reason": "NodeNetworkConnectivityUp",
+      "message": "Node has Network Connectivity"
+    }
+  ],
+  "rules": [
+    {
+      "type": "permanent",
+      "condition": "NodeNetworkConnectivityDown",
+      "reason": "NodeNetworkConnectivityDown",
+      "path": "./custom-config/nodenetworkconnectivity.sh",
+      "timeout": "300s"
+    }
+  ]
+}

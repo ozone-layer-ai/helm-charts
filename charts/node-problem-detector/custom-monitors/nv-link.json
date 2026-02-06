@@ -1,0 +1,27 @@
+{
+  "plugin": "custom",
+  "pluginConfig": {
+    "invoke_interval": "120s",
+    "timeout": "20s",
+    "max_output_length": 80,
+    "concurrency": 1
+  },
+  "source": "nv-link-monitor",
+  "metricsReporting": true,
+  "conditions": [
+    {
+      "type": "NVLinkDown",
+      "reason": "NoNVLinkDown",
+      "message": "All NV Links are up"
+    }
+  ],
+  "rules": [
+    {
+      "type": "permanent",
+      "condition": "NVLinkDown",
+      "reason": "NVLinkDown",
+      "path": "./custom-config/nv-link.sh",
+      "timeout": "20s"
+    }
+  ]
+}
