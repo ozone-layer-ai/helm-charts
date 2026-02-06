@@ -33,7 +33,7 @@ spec:
         {{ $key }}: {{ $val | quote }}
         {{- end}}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/custom-config-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/custom-monitors-configmap.yaml") . | sha256sum }}
         {{- if .Values.annotations }}
         {{- toYaml .Values.annotations | nindent 8 }}
         {{- end }}
@@ -89,9 +89,6 @@ spec:
               mountPath: /etc/localtime
               readOnly: true
             {{- end }}
-            - name: custom-config
-              mountPath: /custom-config
-              readOnly: true
             {{- if and .Values.customMonitors.enabled .Values.customMonitors.volumeMount }}
             - name: {{ .Values.customMonitors.volumeMount.name }}
               mountPath: {{ .Values.customMonitors.volumeMount.mountPath }}
@@ -134,10 +131,6 @@ spec:
             path: /etc/localtime
             type: {{ default "FileOrCreate" .Values.volume.localtime.type }}
         {{- end }}
-        - name: custom-config
-          configMap:
-            name: {{ include "node-problem-detector.customConfig" . }}
-            defaultMode: 493
         {{- if .Values.customMonitors.enabled }}
         - name: {{ .Values.customMonitors.volume.name }}
           configMap:

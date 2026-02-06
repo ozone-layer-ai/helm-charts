@@ -1,5 +1,5 @@
 apiVersion: v2
-version: 0.10.0
+version: 0.11.0
 appVersion: "2b55d13" # NPD image version
 name: node-problem-detector
 description: |

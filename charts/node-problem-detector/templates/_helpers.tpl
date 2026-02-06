@@ -42,14 +42,6 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
-Create the name of the configmap for storing custom monitor definitions
-*/}}
-{{- define "node-problem-detector.customConfig" -}}
-{{- $fullname := include "node-problem-detector.fullname" . -}}
-{{- printf "%s-custom-config" $fullname | replace "+" "_" | trunc 63 -}}
-{{- end -}}
-
-{{/*
 Return the appropriate apiVersion for podSecurityPolicy.
 */}}
 {{- define "podSecurityPolicy.apiVersion" -}}
