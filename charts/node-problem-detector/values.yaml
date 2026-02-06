@@ -165,16 +165,9 @@ env:
 #      fieldRef:
 #        fieldPath: metadata.name
 
-extraVolumes:
-  - name: custom-monitors
-    configMap:
-      name: '{{ include "node-problem-detector.fullname" . }}-custom-monitors'
-      optional: true
+extraVolumes: []
 
-extraVolumeMounts:
-  - name: custom-monitors
-    mountPath: /custom-config
-    readOnly: true
+extraVolumeMounts: []
 
 extraContainers: []
 
@@ -196,6 +189,17 @@ customMonitors:
   # Example: custom-monitors/my-monitor.json, custom-monitors/check-script.sh
   # Files with extensions .example, README.md, and .gitkeep are automatically excluded
   path: "custom-monitors"
+  # customMonitors.volume -- Volume configuration for custom monitors ConfigMap
+  volume:
+    name: custom-monitors
+    configMap:
+      name: '{{ include "node-problem-detector.fullname" . }}-custom-monitors'
+      optional: true
+  # customMonitors.volumeMount -- Volume mount configuration for custom monitors
+  volumeMount:
+    name: custom-monitors
+    mountPath: /custom-config
+    readOnly: true
   #
   # Usage: Simply place your monitor files in the custom-monitors/ directory and reference them:
   #   node-problem-detector:
@@ -204,6 +208,6 @@ customMonitors:
   #         - /config/kernel-monitor.json
   #         - /custom-config/my-custom-monitor.json
   #
-  # The ConfigMap volume is automatically configured in extraVolumes and extraVolumeMounts below.
+  # The ConfigMap volume is automatically configured and mounted when customMonitors.enabled is true.
   #
   # Note: For inline monitor definitions, use node-problem-detector.settings.custom_monitor_definitions

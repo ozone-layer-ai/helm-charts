@@ -92,6 +92,9 @@ spec:
             - name: custom-config
               mountPath: /custom-config
               readOnly: true
+            {{- if and .Values.customMonitors.enabled .Values.customMonitors.volumeMount }}
+            - {{- toYaml .Values.customMonitors.volumeMount | nindent 14 }}
+            {{- end }}
           {{- if .Values.extraVolumeMounts }}
           {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
           {{- end }}
@@ -133,6 +136,9 @@ spec:
           configMap:
             name: {{ include "node-problem-detector.customConfig" . }}
             defaultMode: 493
+        {{- if and .Values.customMonitors.enabled .Values.customMonitors.volume }}
+        - {{- toYaml .Values.customMonitors.volume | nindent 10 }}
+        {{- end }}
       {{- if .Values.extraVolumes }}
       {{- toYaml .Values.extraVolumes | nindent 8 }}
       {{- end }}
