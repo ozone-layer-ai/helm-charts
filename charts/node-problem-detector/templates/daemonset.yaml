@@ -135,6 +135,7 @@ spec:
         - name: {{ .Values.customMonitors.volume.name }}
           configMap:
             name: {{ include "node-problem-detector.fullname" . }}-custom-monitors
+            defaultMode: 493
             optional: true
         {{- end }}
       {{- if .Values.extraVolumes }}
