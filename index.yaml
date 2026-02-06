@@ -193,6 +193,28 @@ entries:
   node-problem-detector:
   - apiVersion: v2
     appVersion: 2b55d13
+    created: "2026-02-06T13:45:37.760163253Z"
+    description: 'This is a fork of https://github.com/deliveryhero/helm-charts/tree/master/stable/node-problem-detector
+      This chart installs a [node-problem-detector](https://github.com/kubernetes/node-problem-detector)
+      daemonset. This tool aims to make various node problems visible to the upstream
+      layers in cluster management stack. It is a daemon which runs on each node,
+      detects node problems and reports them to apiserver. '
+    digest: 4064021f4f3fe77acea8c1da615286d48477c1829e994be0b834ab2d783c706e
+    icon: https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png
+    keywords:
+    - node
+    - problem
+    - detector
+    - monitoring
+    name: node-problem-detector
+    sources:
+    - https://github.com/kubernetes/node-problem-detector
+    - https://kubernetes.io/docs/concepts/architecture/nodes/#condition
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/node-problem-detector-0.8.0/node-problem-detector-0.8.0.tgz
+    version: 0.8.0
+  - apiVersion: v2
+    appVersion: 2b55d13
     created: "2026-02-06T13:13:09.553748589Z"
     description: 'This is a fork of https://github.com/deliveryhero/helm-charts/tree/master/stable/node-problem-detector
       This chart installs a [node-problem-detector](https://github.com/kubernetes/node-problem-detector)
@@ -330,4 +352,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/node-problem-detector-wrapper-0.2.0/node-problem-detector-wrapper-0.2.0.tgz
     version: 0.2.0
-generated: "2026-02-06T13:13:09.55380859Z"
+generated: "2026-02-06T13:45:37.760216593Z"
