@@ -136,8 +136,11 @@ spec:
           configMap:
             name: {{ include "node-problem-detector.customConfig" . }}
             defaultMode: 493
-        {{- if and .Values.customMonitors.enabled .Values.customMonitors.volume }}
-        - {{- toYaml .Values.customMonitors.volume | nindent 10 }}
+        {{- if .Values.customMonitors.enabled }}
+        - name: {{ .Values.customMonitors.volume.name }}
+          configMap:
+            name: {{ include "node-problem-detector.fullname" . }}-custom-monitors
+            optional: true
         {{- end }}
       {{- if .Values.extraVolumes }}
       {{- toYaml .Values.extraVolumes | nindent 8 }}
