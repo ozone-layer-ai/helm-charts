@@ -1,0 +1,2 @@
+# Subchart tarballs — reproducible from Chart.lock via `helm dependency build`
+*.tgz
