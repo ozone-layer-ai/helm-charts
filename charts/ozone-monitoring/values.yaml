@@ -16,7 +16,7 @@
 # =============================================================================
 
 kube-prometheus-stack:
-  prometheus-node-exporter:
+  nodeExporter:
     enabled: false
 
   kube-state-metrics:
