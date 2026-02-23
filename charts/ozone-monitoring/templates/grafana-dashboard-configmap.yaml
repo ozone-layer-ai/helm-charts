@@ -1,0 +1,17 @@
+{{/*
+  Auto-provisions the cluster dashboard into Grafana via the sidecar.
+  The sidecar watches for ConfigMaps with label grafana_dashboard: "1"
+  and loads the JSON from the data field as a dashboard.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cluster-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  cluster-dashboard.json: |-
+{{ .Files.Get "dashboards/cluster-dashboard.json" | indent 4 }}
