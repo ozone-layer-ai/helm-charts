@@ -1,0 +1,15 @@
+{{/*
+  Auto-provisions the logs dashboard into Grafana via the sidecar.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-logs-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  logs-dashboard.json: |-
+{{ .Files.Get "dashboards/logs-dashboard.json" | indent 4 }}

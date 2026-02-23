@@ -1,0 +1,18 @@
+{{/*
+  Auto-provisions the NVIDIA DCGM GPU dashboard into Grafana via the sidecar.
+  Source: Official NVIDIA DCGM Exporter Dashboard (Grafana ID 12239).
+  Requires the GPU Operator to be deployed separately — its DCGM exporter
+  exposes metrics that this dashboard queries.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-gpu-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  gpu-dashboard.json: |-
+{{ .Files.Get "dashboards/gpu-dashboard.json" | indent 4 }}
