@@ -443,6 +443,27 @@ entries:
   ozone-monitoring:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-02-23T10:06:09.773141885Z"
+    dependencies:
+    - name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 82.2.0
+    - name: alloy
+      repository: https://grafana.github.io/helm-charts
+      version: 1.6.0
+    - name: loki
+      repository: https://grafana.github.io/helm-charts
+      version: 6.53.0
+    description: Umbrella chart for AI Datacenter Kubernetes monitoring. Deploys Prometheus,
+      Grafana, Alloy, and a pre-built dashboard in one shot.
+    digest: 6ecbb83a4a13b0b0c551bf83523907296f318037420bc8fa17d3be19cd4ccb58
+    name: ozone-monitoring
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/ozone-monitoring-0.2.0/ozone-monitoring-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-02-23T07:13:56.677931626Z"
     dependencies:
     - name: kube-prometheus-stack
@@ -462,4 +483,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/ozone-monitoring-0.1.0/ozone-monitoring-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-23T07:13:56.677997095Z"
+generated: "2026-02-23T10:06:09.773199533Z"
