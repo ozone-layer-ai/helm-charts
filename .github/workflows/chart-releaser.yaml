@@ -29,8 +29,10 @@ jobs:
             if [ -f "$chart/Chart.yaml" ]; then
               repos=$(yq '.dependencies[].repository' "$chart/Chart.yaml")
               for repo in $repos; do
-                name=$(basename $repo | tr . -)
-                helm repo add $name $repo || true
+                # Build a stable, collision-resistant alias from the full URL.
+                # Example: https://grafana.github.io/helm-charts -> grafana-github-io-helm-charts
+                name=$(echo "$repo" | sed -E 's#^https?://##; s#^oci://##; s#[^a-zA-Z0-9]+#-#g; s#^-+##; s#-+$##' | tr '[:upper:]' '[:lower:]')
+                helm repo add "$name" "$repo" || true
               done
               helm dependency update "$chart"
             fi
