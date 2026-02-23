@@ -1,0 +1,23 @@
+{{/*
+  Provisions the Loki datasource into Grafana via the sidecar.
+  Uses a templated URL so it resolves correctly regardless of
+  the Helm release name or namespace.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-grafana-loki-datasource
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_datasource: "1"
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  loki-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        url: http://{{ .Release.Name }}-loki.{{ .Release.Namespace }}.svc:3100
+        access: proxy
+        isDefault: false

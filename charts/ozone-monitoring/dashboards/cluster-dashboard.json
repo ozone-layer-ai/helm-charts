@@ -367,7 +367,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{instance=~\"$node\", mode=\"idle\"}[5m])))",
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])))",
           "legendFormat": "",
           "instant": true,
           "range": false,
@@ -441,7 +441,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "100 * (1 - (sum(node_memory_MemAvailable_bytes{instance=~\"$node\"}) / sum(node_memory_MemTotal_bytes{instance=~\"$node\"})))",
+          "expr": "100 * (1 - (sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)))",
           "legendFormat": "",
           "instant": true,
           "range": false,
@@ -485,7 +485,7 @@
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "prometheus" },
         "editorMode": "code",
-        "expr": "100 * (1 - avg by (instance) (\n  rate(node_cpu_seconds_total{instance=~\"$node\", mode=\"idle\"}[5m])\n))",
+        "expr": "100 * (1 - avg by (instance)(rate(node_cpu_seconds_total{instance=~\"$node\", mode=\"idle\"}[5m])))",
         "legendFormat": "{{instance}}", "range": true, "refId": "A"
       }],
       "title": "CPU Utilisation",
@@ -524,7 +524,7 @@
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "prometheus" },
         "editorMode": "code",
-        "expr": "100 * (1 - (\n  node_memory_MemAvailable_bytes{instance=~\"$node\"}\n  /\n  node_memory_MemTotal_bytes{instance=~\"$node\"}\n))",
+        "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=~\"$node\"} / node_memory_MemTotal_bytes{instance=~\"$node\"}))",
         "legendFormat": "{{instance}}", "range": true, "refId": "A"
       }],
       "title": "Memory Utilisation",
@@ -561,7 +561,7 @@
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "prometheus" },
         "editorMode": "code",
-        "expr": "100 * (1 - (\n  node_filesystem_avail_bytes{instance=~\"$node\", mountpoint=\"/\", fstype!~\"tmpfs|overlay\"}\n  /\n  node_filesystem_size_bytes{instance=~\"$node\", mountpoint=\"/\", fstype!~\"tmpfs|overlay\"}\n))",
+        "expr": "100 * (1 - (node_filesystem_avail_bytes{instance=~\"$node\", mountpoint=\"/var/lib/bottlerocket\"} / node_filesystem_size_bytes{instance=~\"$node\", mountpoint=\"/var/lib/bottlerocket\"}))",
         "legendFormat": "{{instance}}", "range": true, "refId": "A"
       }],
       "title": "Storage Utilisation",
@@ -601,8 +601,8 @@
       },
       "pluginVersion": "12.3.3",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (node) (kube_pod_container_resource_requests{resource=\"cpu\", node=~\"$node\"})", "legendFormat": "Requested", "range": true, "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (node) (rate(container_cpu_usage_seconds_total{node=~\"$node\", container!=\"\", image!=\"\"}[5m]))", "legendFormat": "Used", "range": true, "refId": "B" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", node=~\"$node\"})", "legendFormat": "Requested", "range": true, "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(rate(container_cpu_usage_seconds_total{node=~\"$node\", container!=\"\", image!=\"\"}[5m]))", "legendFormat": "Used", "range": true, "refId": "B" }
       ],
       "title": "CPU: Requested vs Used",
       "type": "timeseries"
@@ -636,8 +636,8 @@
       },
       "pluginVersion": "12.3.3",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (node) (kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\"})", "legendFormat": "Requested", "range": true, "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (node) (container_memory_working_set_bytes{node=~\"$node\", container!=\"\", image!=\"\"})", "legendFormat": "Used", "range": true, "refId": "B" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\"})", "legendFormat": "Requested", "range": true, "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(container_memory_working_set_bytes{node=~\"$node\", container!=\"\", image!=\"\"})", "legendFormat": "Used", "range": true, "refId": "B" }
       ],
       "title": "Memory: Requested vs Used",
       "type": "timeseries"
@@ -915,8 +915,8 @@
       },
       "pluginVersion": "12.3.3",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (instance) (rate(node_network_receive_bytes_total{instance=~\"$node\", device!~\"lo|veth.*|docker.*|flannel.*|cali.*|cbr.*|cni.*\"}[5m]))", "legendFormat": "Receive", "range": true, "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "- sum by (instance) (rate(node_network_transmit_bytes_total{instance=~\"$node\", device!~\"lo|veth.*|docker.*|flannel.*|cali.*|cbr.*|cni.*\"}[5m]))", "legendFormat": "Transmit", "range": true, "refId": "B" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(rate(node_network_receive_bytes_total{instance=~\"$node\", device!~\"lo|veth.*|docker.*|flannel.*|cali.*|cbr.*|cni.*\"}[5m]))", "legendFormat": "Receive", "range": true, "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "- sum(rate(node_network_transmit_bytes_total{instance=~\"$node\", device!~\"lo|veth.*|docker.*|flannel.*|cali.*|cbr.*|cni.*\"}[5m]))", "legendFormat": "Transmit", "range": true, "refId": "B" }
       ],
       "title": "Network I/O",
       "type": "timeseries"
@@ -955,8 +955,8 @@
       },
       "pluginVersion": "12.3.3",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_node_status_allocatable{resource=\"cpu\", node=~\"$node\"}", "legendFormat": "Allocatable", "range": true, "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (node) (kube_pod_container_resource_requests{resource=\"cpu\", node=~\"$node\"})", "legendFormat": "Allocated", "range": true, "refId": "B" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(kube_node_status_allocatable{resource=\"cpu\", node=~\"$node\"})", "legendFormat": "Allocatable", "range": true, "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", node=~\"$node\"})", "legendFormat": "Allocated", "range": true, "refId": "B" }
       ],
       "title": "CPU: Allocatable vs Allocated",
       "type": "timeseries"
@@ -990,8 +990,8 @@
       },
       "pluginVersion": "12.3.3",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_node_status_allocatable{resource=\"memory\", node=~\"$node\"}", "legendFormat": "Allocatable", "range": true, "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum by (node) (kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\"})", "legendFormat": "Allocated", "range": true, "refId": "B" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(kube_node_status_allocatable{resource=\"memory\", node=~\"$node\"})", "legendFormat": "Allocatable", "range": true, "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\"})", "legendFormat": "Allocated", "range": true, "refId": "B" }
       ],
       "title": "Memory: Allocatable vs Allocated",
       "type": "timeseries"
@@ -1063,7 +1063,7 @@
           "type": "prometheus",
           "uid": "$datasource"
         },
-        "definition": "label_values(node_uname_info, instance)",
+        "definition": "label_values(kube_node_info, node)",
         "includeAll": true,
         "label": "Node",
         "multi": true,
@@ -1071,7 +1071,7 @@
         "options": [],
         "query": {
           "qryType": 5,
-          "query": "label_values(node_uname_info, instance)",
+          "query": "label_values(kube_node_info, node)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,

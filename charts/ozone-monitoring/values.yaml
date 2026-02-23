@@ -2,14 +2,13 @@
 # Ozone Monitoring — Unified Values
 # =============================================================================
 #
-# IMPORTANT: This chart MUST be installed with release name "monitoring"
-# into namespace "monitoring" for the Alloy → Prometheus connection to work:
+# Install with any release name and namespace:
 #
-#   helm install monitoring ./ozone-monitoring -n monitoring --create-namespace
+#   helm install <release> ./ozone-monitoring -n <namespace> --create-namespace
 #
-# If you change the release name or namespace, update the remote_write URL
-# inside alloy.alloy.configMap.content below to match:
-#   http://<release>-kube-prometheus-prometheus.<namespace>.svc:9090/api/v1/write
+# All internal service URLs (Prometheus, Loki) are dynamically derived from
+# the Helm release name and namespace via templated ConfigMaps — no manual
+# URL edits needed.
 #
 # The bundled dashboard references datasource UID "prometheus", which matches
 # the default Prometheus datasource provisioned by kube-prometheus-stack.
@@ -30,177 +29,30 @@ kube-prometheus-stack:
         enabled: true
         label: grafana_dashboard
         labelValue: "1"
-    additionalDataSources:
-      - name: Loki
-        type: loki
-        url: http://loki.monitoring.svc:3100
-        access: proxy
-        isDefault: false
+      # Datasource sidecar picks up ConfigMaps with grafana_datasource: "1" label.
+      # The Loki datasource is provisioned via templates/grafana-loki-datasource.yaml
+      # with a dynamic URL derived from the Helm release name and namespace.
+      datasources:
+        enabled: true
+        label: grafana_datasource
+        labelValue: "1"
 
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: false
       enableRemoteWriteReceiver: true
-
-  # TODO: Remove if actual cluster and WITHOUT Cilium (set to true — kube-prometheus-stack handles kubelet natively)
   kubelet:
-    enabled: false
+    enabled: true
 
 alloy:
   alloy:
+    # Use our custom ConfigMap template (templates/alloy-config-configmap.yaml)
+    # instead of inline content, so Prometheus and Loki URLs are dynamically
+    # derived from the Helm release name and namespace.
     configMap:
-      create: true
-      content: |
-        // Node-level host metrics (replaces prometheus-node-exporter) - mainly for storage
-        prometheus.exporter.unix "node" {
-          procfs_path = "/host/proc"
-          sysfs_path  = "/host/sys"
-          rootfs_path = "/host/root"
-        }
-
-        prometheus.scrape "node" {
-          targets = prometheus.exporter.unix.node.targets
-          forward_to = [prometheus.remote_write.local.receiver]
-        }
-
-        // TODO: Remove if actual cluster and WITHOUT Cilium (all 3 blocks below — add_node, kubelet, cadvisor)
-        prometheus.relabel "add_node" {
-          forward_to = [prometheus.remote_write.local.receiver]
-
-          rule {
-            action       = "replace"
-            target_label = "node"
-            replacement  = env("NODE_NAME")
-          }
-        }
-
-        prometheus.scrape "kubelet" {
-          scheme     = "https"
-          tls_config {
-            insecure_skip_verify = true
-          }
-          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-          targets = [{
-            "__address__" = "localhost:10250",
-            "__metrics_path__" = "/metrics",
-          }]
-          forward_to = [prometheus.relabel.add_node.receiver]
-        }
-
-        prometheus.scrape "cadvisor" {
-          scheme     = "https"
-          tls_config {
-            insecure_skip_verify = true
-          }
-          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-          targets = [{
-            "__address__" = "localhost:10250",
-            "__metrics_path__" = "/metrics/cadvisor",
-          }]
-          forward_to = [prometheus.relabel.add_node.receiver]
-        }
-
-        prometheus.remote_write "local" {
-          endpoint {
-            url = "http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090/api/v1/write"
-          }
-        }
-
-        // --- Log collection ---
-
-        discovery.kubernetes "pods" {
-          role = "pod"
-        }
-
-        discovery.relabel "pods" {
-          targets    = discovery.kubernetes.pods.targets
-
-          rule {
-            source_labels = ["__meta_kubernetes_namespace"]
-            target_label  = "namespace"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_name"]
-            target_label  = "pod"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_container_name"]
-            target_label  = "container"
-          }
-        }
-
-        loki.source.kubernetes "pods" {
-          targets    = discovery.relabel.pods.output
-          forward_to = [loki.process.tenant.receiver]
-        }
-
-        loki.process "tenant" {
-          stage.static_labels {
-            values = {
-              tenant_id = env("TENANT_ID"),
-            }
-          }
-
-          // Extract log level from common patterns (case-insensitive)
-          stage.regex {
-            expression = "(?i)(?P<level>\\b(?:FATAL|PANIC|CRITICAL|EMERG|ERROR|ERR|WARN|WARNING|INFO|INF|DEBUG|DBG|TRACE|TRC)\\b)"
-          }
-
-          // Normalize extracted level — regex is case-insensitive so we
-          // get mixed-case captures. Replace stages map all variants to
-          // a single lowercase value.
-          stage.replace {
-            expression = "(?i)^(warning|warn)$"
-            source     = "level"
-            replace    = "warn"
-          }
-
-          stage.replace {
-            expression = "(?i)^(err|error)$"
-            source     = "level"
-            replace    = "error"
-          }
-
-          stage.replace {
-            expression = "(?i)^(fatal|panic|critical|emerg)$"
-            source     = "level"
-            replace    = "critical"
-          }
-
-          stage.replace {
-            expression = "(?i)^(inf|info)$"
-            source     = "level"
-            replace    = "info"
-          }
-
-          stage.replace {
-            expression = "(?i)^(dbg|debug)$"
-            source     = "level"
-            replace    = "debug"
-          }
-
-          stage.replace {
-            expression = "(?i)^(trc|trace)$"
-            source     = "level"
-            replace    = "trace"
-          }
-
-          stage.labels {
-            values = {
-              level = "",
-            }
-          }
-
-          forward_to = [loki.write.local.receiver]
-        }
-
-        loki.write "local" {
-          endpoint {
-            url = "http://loki.monitoring.svc:3100/loki/api/v1/push"
-          }
-        }
+      # Disabled — we provide our own ConfigMap (templates/alloy-config-configmap.yaml)
+      # with dynamic Prometheus and Loki URLs derived from the Helm release name/namespace.
+      create: false
 
     # TODO: Remove if actual cluster and WITHOUT Cilium (only used by the add_node relabel block)
     extraEnv:
@@ -251,8 +103,6 @@ alloy:
 # Loki — SingleBinary mode for dev
 # =============================================================================
 loki:
-  fullnameOverride: loki
-
   deploymentMode: SingleBinary
 
   loki:
