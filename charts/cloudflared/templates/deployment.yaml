@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,8 +14,6 @@ spec:
     metadata:
       creationTimestamp: null
       annotations:
-        # These are here so the deployment rolls when the config or secret change.
-{{/*        checksum/secret: {{ .Values.cloudflare.tunnel_token | sha256sum }}*/}}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -54,3 +53,5 @@ spec:
             failureThreshold: 1
             initialDelaySeconds: 10
             periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
