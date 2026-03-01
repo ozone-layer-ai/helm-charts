@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kubernetes-operator.fullname" . }}-manager
+  labels:
+    {{- include "kubernetes-operator.labels" . | nindent 4 }}
+rules:
+  {{- toYaml .Values.clusterRoleRules | nindent 2 }}

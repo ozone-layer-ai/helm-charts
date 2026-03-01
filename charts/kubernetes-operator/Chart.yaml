@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kubernetes-operator
+description: A generic Helm chart for deploying Kubernetes operators with webhooks, cert-manager integration and leader election
+type: application
+version: 0.1.0
+appVersion: "latest"

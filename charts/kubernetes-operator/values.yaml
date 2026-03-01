@@ -1,0 +1,77 @@
+replicaCount: 1
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Extra environment variables injected into the operator container
+env: []
+
+# Resource requests and limits
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
+# Webhook configuration
+webhook:
+  enabled: true
+  # Port the operator listens on for webhook requests
+  port: 9443
+  # List of ValidatingWebhook entries. Each entry must have:
+  #   name: unique webhook name (e.g. vclusteraddon-v1alpha1.kb.io)
+  #   path: handler path (e.g. /validate-...)
+  #   rules: list of Kubernetes admission rules (apiGroups, apiVersions, operations, resources)
+  #   failurePolicy: Fail or Ignore
+  webhooks: []
+  # Example:
+  # webhooks:
+  #   - name: vclusteraddon-v1alpha1.kb.io
+  #     path: /validate-provisioning-ozonelayerai-com-v1alpha1-clusteraddon
+  #     failurePolicy: Fail
+  #     rules:
+  #       - apiGroups: ["provisioning.ozonelayerai.com"]
+  #         apiVersions: ["v1alpha1"]
+  #         operations: ["CREATE", "UPDATE"]
+  #         resources: ["clusteraddons"]
+
+# Leader election
+leaderElection:
+  enabled: true
+
+# ClusterRole rules for the operator manager.
+# Mirrors config/rbac/role.yaml - update whenever make manifests changes that file.
+clusterRoleRules: []
+# Example:
+# clusterRoleRules:
+#   - apiGroups: ["provisioning.ozonelayerai.com"]
+#     resources: ["kubernetesclusters"]
+#     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Deployment strategy
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: "25%"
+    maxUnavailable: "25%"

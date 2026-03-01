@@ -1,0 +1,28 @@
+{{- if .Values.webhook.enabled }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "kubernetes-operator.fullname" . }}-selfsigned-issuer
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubernetes-operator.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "kubernetes-operator.fullname" . }}-serving-cert
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubernetes-operator.labels" . | nindent 4 }}
+spec:
+  dnsNames:
+    - {{ include "kubernetes-operator.fullname" . }}-webhook.{{ .Release.Namespace }}.svc
+    - {{ include "kubernetes-operator.fullname" . }}-webhook.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: {{ include "kubernetes-operator.fullname" . }}-selfsigned-issuer
+  secretName: {{ include "kubernetes-operator.fullname" . }}-webhook-cert
+{{- end }}
