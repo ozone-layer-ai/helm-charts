@@ -4,6 +4,7 @@ image:
   repository: ""
   tag: ""
   pullPolicy: IfNotPresent
+  command: /app/provisioning-operator
 
 imagePullSecrets: []
 

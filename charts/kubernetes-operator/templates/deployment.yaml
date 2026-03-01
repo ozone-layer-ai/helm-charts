@@ -39,6 +39,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - {{ .Values.image.command | default "/app/provisioning-operator" }}
           args:
             - --health-probe-bind-address=:8081
             - --metrics-bind-address=0
