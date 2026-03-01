@@ -89,6 +89,18 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/kamaji-tenant-0.1.0/kamaji-tenant-0.1.0.tgz
     version: 0.1.0
+  kubernetes-operator:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-03-01T21:01:27.240970013Z"
+    description: A generic Helm chart for deploying Kubernetes operators with webhooks,
+      cert-manager integration and leader election
+    digest: d1fcacec9b93d93554c2cda3255a4ae0b652574ddc6822361c30dd951c87ef21
+    name: kubernetes-operator
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/kubernetes-operator-0.1.0/kubernetes-operator-0.1.0.tgz
+    version: 0.1.0
   microservice:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -493,4 +505,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/ozone-monitoring-0.1.0/ozone-monitoring-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-24T16:51:46.549241405Z"
+generated: "2026-03-01T21:01:27.241025808Z"
