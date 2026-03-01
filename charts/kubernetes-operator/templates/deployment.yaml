@@ -45,11 +45,13 @@ spec:
             {{- if .Values.leaderElection.enabled }}
             - --leader-elect
             {{- end }}
+          {{- with .Values.env }}
           env:
-            {{- range .Values.env }}
+            {{- range . }}
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
+          {{- end }}
           {{- if .Values.webhook.enabled }}
           volumeMounts:
             - name: webhook-cert
