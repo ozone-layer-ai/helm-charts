@@ -1,19 +1,69 @@
-{{- if include "microservice.hasChainedMiddlewares" . }}
+{{- if and .Values.routes.enabled .Values.routes.rules }}
+{{- $root := . }}
+
+{{- range $rule := .Values.routes.rules }}
+
+{{- $m := $rule.middlewares | default dict }}
+
+{{- if include "microservice.hasChainedMiddlewares" $rule }}
+
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: {{ include "microservice.fullname" .}}-chain
+  name: {{ printf "%s-%s-chain" (include "microservice.fullname" $root) $rule.name }}
+
 spec:
   chain:
     middlewares:
-    
-    {{- if .Values.httproute.middlewares.acl.enabled }}
+
+    {{- if $m.consoleacl }}
     - name: traefik-console-ip-acl@kubernetescrd
-    {{- end -}}
+    {{- end }}
 
-    {{- if .Values.httproute.middlewares.auth.enabled }}
+    {{- if $m.auth }}
     - name: traefik-oauth2-proxy@kubernetescrd
-    {{- end -}}
+    {{- end }}
 
-{{- end}}
+    {{- if $m.acl }}
+    - name: {{ printf "%s-%s-acl" (include "microservice.fullname" $root) $rule.name }}
+    {{- end }}
+
+{{- end }}
+
+{{- end }}
+{{- end }}
+---
+{{- if and .Values.routes.enabled .Values.routes.rules }}
+{{- $root := . }}
+
+{{- range $rule := .Values.routes.rules }}
+
+{{- $m := $rule.middlewares | default dict }}
+
+{{- if $m.acl }}
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ printf "%s-%s-acl" (include "microservice.fullname" $root) $rule.name }}
+
+spec:
+  ipAllowList:
+    ipStrategy:
+      depth: 1
+      excludedIPs:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+
+    sourceRange:
+    {{- range $m.acl.sourceRange }}
+    - {{ . }}
+    {{- end }}
+
+{{- end }}
+
+{{- end }}
+{{- end }}
