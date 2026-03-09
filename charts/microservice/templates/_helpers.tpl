@@ -88,7 +88,20 @@ Check if any security middleware is enabled.
 Returns "true" if either ACL or Auth is enabled, otherwise empty string.
 */}}
 {{- define "microservice.hasChainedMiddlewares" -}}
-  {{- if or .Values.httproute.middlewares.acl.enabled .Values.httproute.middlewares.auth.enabled -}}
-    true
-  {{- end -}}
-{{- end -}}
+{{- $m := .middlewares | default dict -}}
+
+{{- if or $m.auth $m.consoleacl $m.acl }}
+true
+{{- end }}
+
+{{- end }}
+
+{{- define "microservice.gatewayByName" -}}
+{{- $name := .name }}
+{{- $gateways := .gateways }}
+{{- range $g := $gateways }}
+  {{- if eq $g.name $name }}
+    {{- toYaml $g }}
+  {{- end }}
+{{- end }}
+{{- end }}

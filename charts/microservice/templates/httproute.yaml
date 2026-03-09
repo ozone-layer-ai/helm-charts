@@ -1,77 +1,75 @@
-{{- if .Values.httproute.enabled -}}
-{{- $fullName := include "microservice.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- if and .Values.routes.enabled .Values.routes.rules }}
+{{- $root := . }}
 
+{{- range $rule := .Values.routes.rules }}
+
+{{- $gateway := (include "microservice.gatewayByName" (dict "name" $rule.gateway "gateways" $root.Values.routes.gateways) | fromYaml) }}
+{{- $fullName := printf "%s-%s" (include "microservice.fullname" $root) $rule.name }}
+
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "microservice.labels" . | nindent 4 }}
-  {{- with .Values.httproute.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- include "microservice.labels" $root | nindent 4 }}
 
 spec:
   parentRefs:
-    - name: {{ .Values.httproute.gateway.name }}
-      namespace: {{ .Values.httproute.gateway.namespace | default .Release.Namespace }}
-      {{- if .Values.httproute.gateway.sectionName }}
-      sectionName: {{ .Values.httproute.gateway.sectionName }}
-      {{- end }}
+  - name: {{ $gateway.gateway.name }}
+    namespace: {{ $gateway.gateway.namespace | default $root.Release.Namespace }}
 
-  {{- if .Values.httproute.hostnames }}
+  {{- if $rule.hostnames }}
   hostnames:
-    {{- range .Values.httproute.hostnames }}
-    - {{ . | quote }}
-    {{- end }}
+  {{- range $rule.hostnames }}
+  - {{ . | quote }}
+  {{- end }}
   {{- end }}
 
   rules:
-    {{- range .Values.httproute.rules }}
-    - matches:
-        {{- range .matches }}
-        - path:
-            type: {{ .path.type | default "PathPrefix" }}
-            value: {{ .path.value | quote }}
-        {{- end }}
-
-      {{- $filters := list }}
-
-      {{- if $.Values.httproute.middlewares.stripPath.enabled }}
-      {{- $filters = append $filters (dict
-          "type" "URLRewrite"
-          "urlRewrite" (dict
-            "path" (dict
-              "type" "ReplacePrefixMatch"
-              "replacePrefixMatch" "/"
-            )
-          )
-        )
-      }}
-      {{- end }}
-
-      {{- if include "microservice.hasChainedMiddlewares" $ }}
-      {{- $filters = append $filters (dict
-          "type" "ExtensionRef"
-          "extensionRef" (dict
-            "group" "traefik.io"
-            "kind" "Middleware"
-            "name" (printf "%s-chain" $fullName)
-          )
-        )
-      }}
-      {{- end }}
-
-      {{- if gt (len $filters) 0 }}
-      filters:
-        {{- toYaml $filters | nindent 8 }}
-      {{- end }}
-
-      backendRefs:
-        - name: {{ $fullName }}
-          port: {{ $svcPort }}
+  - matches:
+    {{- range $rule.matches }}
+    - path:
+        type: {{ .type | default "PathPrefix" }}
+        value: {{ .path | quote }}
     {{- end }}
 
+    {{- $filters := list }}
+
+    {{- $m := $rule.middlewares | default dict }}
+    {{- if $m.stripPath }}
+    {{- $filters = append $filters (dict
+        "type" "URLRewrite"
+        "urlRewrite" (dict
+          "path" (dict
+            "type" "ReplacePrefixMatch"
+            "replacePrefixMatch" "/"
+          )
+        )
+      )
+    }}
+    {{- end }}
+
+    {{- if include "microservice.hasChainedMiddlewares" $rule }}
+    {{- $filters = append $filters (dict
+        "type" "ExtensionRef"
+        "extensionRef" (dict
+          "group" "traefik.io"
+          "kind" "Middleware"
+          "name" (printf "%s-%s-chain" (include "microservice.fullname" $root) $rule.name)
+        )
+      )
+    }}
+    {{- end }}
+
+    {{- if gt (len $filters) 0 }}
+    filters:
+      {{- toYaml $filters | nindent 6 }}
+    {{- end }}
+
+    backendRefs:
+    - name: {{ include "microservice.fullname" $root }}
+      port: {{ $root.Values.service.port }}
+
+{{- end }}
 {{- end }}

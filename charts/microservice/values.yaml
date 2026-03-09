@@ -94,18 +94,35 @@ deployment:
     claimStorageClass: local-path
     containerMountPath: /persistent_store
 
-httproute:
+routes:
   enabled: false
 
-  gateway:
-    name:
-    namespace:
-    sectionName:
+  gateways: []
+    # - name: public
+    #   gateway:
+    #     name: main-gateway
+    #     namespace: networking
 
-  hostnames: []
   rules: []
-  middlewares: {}
-  annotations: {}
+    # - name: api
+    #   gateway: public
+    #   hostnames:
+    #     - api.example.com
+
+    #   matches:
+    #     - path: /api
+    #       type: PathPrefix
+
+    #   middlewares:
+    #     stripPath: true
+
+    # - name: metrics
+    #   gateway: public
+    #   hostnames:
+    #     - metrics.example.com
+
+    #   matches:
+    #     - path: /metrics
 
 resources:
   # The default limits and resources are set in deployment.yaml.
