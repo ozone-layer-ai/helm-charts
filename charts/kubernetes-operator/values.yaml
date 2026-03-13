@@ -33,9 +33,15 @@ webhook:
   #   path: handler path (e.g. /validate-...)
   #   rules: list of Kubernetes admission rules (apiGroups, apiVersions, operations, resources)
   #   failurePolicy: Fail or Ignore
-  webhooks: []
+  validatingWebhooks: []
+  # List of MutatingWebhook entries. Each entry must have:
+  #   name: unique webhook name (e.g. muser-v1alpha1.kb.io)
+  #   path: handler path (e.g. /mutate-...)
+  #   rules: list of Kubernetes admission rules (apiGroups, apiVersions, operations, resources)
+  #   failurePolicy: Fail or Ignore
+  mutatingWebhooks: []
   # Example:
-  # webhooks:
+  # validatingWebhooks:
   #   - name: vclusteraddon-v1alpha1.kb.io
   #     path: /validate-provisioning-ozonelayerai-com-v1alpha1-clusteraddon
   #     failurePolicy: Fail
@@ -44,6 +50,15 @@ webhook:
   #         apiVersions: ["v1alpha1"]
   #         operations: ["CREATE", "UPDATE"]
   #         resources: ["clusteraddons"]
+  # mutatingWebhooks:
+  #   - name: muser.iam.ozonelayerai.com
+  #     path: /mutate-iam-ozonelayerai-com-v1alpha1-user
+  #     failurePolicy: Fail
+  #     rules:
+  #       - apiGroups: ["iam.ozonelayerai.com"]
+  #         apiVersions: ["v1alpha1"]
+  #         operations: ["CREATE", "UPDATE"]
+  #         resources: ["users"]
 
 # Leader election
 leaderElection:
