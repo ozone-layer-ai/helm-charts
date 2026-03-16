@@ -2,6 +2,10 @@
 
 # Cloudflare parameters.
 cloudflare:
+  # tunnel_token: when set, the chart creates a `tunnel-token` Secret and injects the value directly.
+  tunnel_token: ""
+  # tunnel_token_secret_ref: used when the Secret is pre-created externally (e.g. by a CRS or SealedSecret).
+  # Only used when tunnel_token is empty.
   tunnel_token_secret_ref:
     name: ""
     key: ""
