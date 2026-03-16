@@ -42,8 +42,13 @@ spec:
             - name: TUNNEL_TOKEN
               valueFrom:
                 secretKeyRef:
+                  {{- if .Values.cloudflare.tunnel_token }}
+                  name: tunnel-token
+                  key: token
+                  {{- else }}
                   name: {{ .Values.cloudflare.tunnel_token_secret_ref.name }}
                   key: {{ .Values.cloudflare.tunnel_token_secret_ref.key }}
+                  {{- end }}
           livenessProbe:
             httpGet:
               # Cloudflared has a /ready endpoint which returns 200 if and only if
