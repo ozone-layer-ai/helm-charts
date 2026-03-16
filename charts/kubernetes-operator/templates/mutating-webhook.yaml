@@ -1,14 +1,14 @@
-{{- if and .Values.webhook.enabled .Values.webhook.validatingWebhooks }}
+{{- if and .Values.webhook.enabled .Values.webhook.mutatingWebhooks }}
 apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration
+kind: MutatingWebhookConfiguration
 metadata:
-  name: {{ include "kubernetes-operator.fullname" . }}-validating-webhook
+  name: {{ include "kubernetes-operator.fullname" . }}-mutating-webhook
   labels:
     {{- include "kubernetes-operator.labels" . | nindent 4 }}
   annotations:
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "kubernetes-operator.fullname" . }}-serving-cert
 webhooks:
-  {{- range .Values.webhook.validatingWebhooks }}
+  {{- range .Values.webhook.mutatingWebhooks }}
   - admissionReviewVersions:
       - v1
     clientConfig:
