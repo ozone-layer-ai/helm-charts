@@ -3,6 +3,16 @@ entries:
   cloudflared:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-03-16T12:20:34.790611899Z"
+    description: A Helm chart for Cloudflared tunnel
+    digest: 1f54cd5e9c8442e190c8c813cbca2510d8c55d601212be391aabf5a1ba734ccd
+    name: cloudflared
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/cloudflared-0.1.3/cloudflared-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2026-02-24T16:51:46.549194417Z"
     description: A Helm chart for Cloudflared tunnel
     digest: a0c0706fc030bf5b00314e581098a639973805a23b0ca22552de814484812f7f
@@ -548,4 +558,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/ozone-monitoring-0.1.0/ozone-monitoring-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-16T07:39:59.07724282Z"
+generated: "2026-03-16T12:20:34.790684074Z"
