@@ -92,6 +92,17 @@ entries:
   kubernetes-operator:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-03-16T07:39:59.077134918Z"
+    description: A generic Helm chart for deploying Kubernetes operators with webhooks,
+      cert-manager integration and leader election
+    digest: a8813c7c3146e0071e1b9223c53ec15d9d2460770e7fb39dead0e198bca7c176
+    name: kubernetes-operator
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/kubernetes-operator-0.4.0/kubernetes-operator-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-03-01T21:22:40.774722345Z"
     description: A generic Helm chart for deploying Kubernetes operators with webhooks,
       cert-manager integration and leader election
@@ -537,4 +548,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/ozone-monitoring-0.1.0/ozone-monitoring-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-09T10:11:19.663104757Z"
+generated: "2026-03-16T07:39:59.07724282Z"
