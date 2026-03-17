@@ -1,0 +1,5 @@
+sealedSecrets: []
+# - name: ghcr-creds
+#   type: kubernetes.io/dockerconfigjson
+#   encryptedData:
+#     .dockerconfigjson: "<kubeseal output>"
