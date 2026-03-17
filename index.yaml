@@ -558,4 +558,15 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/ozone-monitoring-0.1.0/ozone-monitoring-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-16T12:20:34.790684074Z"
+  sealed-secrets-bundle:
+  - apiVersion: v2
+    created: "2026-03-17T12:37:48.234243273Z"
+    description: Generic Helm chart for deploying a collection of Sealed Secrets into
+      a namespace
+    digest: d89d8dee138f22ab5a85cda44ce68ef9ab516e7f29efded251ef7bb648efc7b8
+    name: sealed-secrets-bundle
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/sealed-secrets-bundle-0.1.0/sealed-secrets-bundle-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-03-17T12:37:48.234586085Z"
