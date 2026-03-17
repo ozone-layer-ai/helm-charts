@@ -1,0 +1,5 @@
+apiVersion: v2
+name: sealed-secrets-bundle
+description: Generic Helm chart for deploying a collection of Sealed Secrets into a namespace
+type: application
+version: 0.1.0
