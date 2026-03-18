@@ -1,6 +1,8 @@
 sealedSecrets: []
 # - name: ghcr-creds
 #   type: kubernetes.io/dockerconfigjson
+#   templateLabels:
+#     my-label-key: my-label-value
 #   templateAnnotations:
 #     my-annotation-key: my-annotation-value
 #   encryptedData:
