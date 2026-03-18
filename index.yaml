@@ -560,6 +560,16 @@ entries:
     version: 0.1.0
   sealed-secrets-bundle:
   - apiVersion: v2
+    created: "2026-03-18T09:09:07.855830495Z"
+    description: Generic Helm chart for deploying a collection of Sealed Secrets into
+      a namespace
+    digest: ee96315a1fc81e2be81289914a54e208c4e66864cf5d03895d0b8ee9b6169fc6
+    name: sealed-secrets-bundle
+    type: application
+    urls:
+    - https://github.com/ozone-layer-ai/helm-charts/releases/download/sealed-secrets-bundle-0.2.0/sealed-secrets-bundle-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2026-03-17T12:37:48.234243273Z"
     description: Generic Helm chart for deploying a collection of Sealed Secrets into
       a namespace
@@ -569,4 +579,4 @@ entries:
     urls:
     - https://github.com/ozone-layer-ai/helm-charts/releases/download/sealed-secrets-bundle-0.1.0/sealed-secrets-bundle-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-17T12:37:48.234586085Z"
+generated: "2026-03-18T09:09:07.855897861Z"
